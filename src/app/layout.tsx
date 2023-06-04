@@ -18,10 +18,12 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className + " flex min-h-screen flex-col items-center justify-between p-24"}>
-        <Header/>
-        {children}
-        <FooterNav/>
+      <body className={`min-h-screen flex flex-col items-center justify-between bg-blue-500 ${inter.className}`}>
+    <Header />
+      <main className="flex-1 bg-orange-500 w-full flex flex-col items-center justify-around">
+      {children}
+  </main>
+       <FooterNav/>
         </body>
     </html>
   )
