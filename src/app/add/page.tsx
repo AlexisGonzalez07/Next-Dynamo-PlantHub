@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import Image from "next/image";
+import axios from "axios";
+
 interface Plant {
   name: string;
   nickname?: string;
@@ -12,9 +14,6 @@ interface Plant {
   waterAdded?: number;
   birthday: string;
   image?: string;
-}
-interface ImageField {
-  image: File | "";
 }
 
 interface FormField {
@@ -56,11 +55,94 @@ const formFields: FormField[] = [
 ];
 
 export default function AddPlant() {
+  console.log(process.env.NEXT_PUBLIC_PLANT_API_URL);
   const [step, setStep] = useState(1);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [plantRecommendations, setPlantRecommendations] = useState(null);
+  const plantForm: Plant = {
+    name: "",
+    nickname: "",
+    plantType: "Outdoor",
+    plantSize: "M",
+    waterNeeded: 15,
+    waterAdded: 0,
+    birthday: "",
+    image: "",
+  };
+  const [plantState, setPlantState] = useState(plantForm);
+  console.log(plantRecommendations);
+  console.log(plantState);
+  useEffect(() => {
+    if (plantRecommendations === null) {
+      return;
+    }
+    let neededWater = Math.floor(plantRecommendations?.minWater * 10);
+    setPlantState((prevState) => ({
+      ...prevState,
+      name: plantRecommendations.plant_name,
+      waterNeeded: neededWater || 15,
+      image: plantRecommendations.image || plantRecommendations.wiki_image || "",
+    }));
+  }, [plantRecommendations]);
+
+  const processFileData = async (fileData) => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_PLANT_API_URL}`,
+        {
+          api_key: `${process.env.NEXT_PUBLIC_PLANT_API_KEY}`,
+          images: [fileData],
+          plant_details: [
+            "common_names",
+            "name_authority",
+            "watering",
+            "wiki_image",
+            "wiki_description",
+            "url",
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const { data } = response;
+      console.log(data);
+      if (response.status !== 200) {
+        alert("COULDN'T PROCESS IMAGE");
+        return;
+      }
+      if (data?.suggestions?.length) {
+        setPlantRecommendations({
+          plant_name: data.suggestions[0].plant_details?.scientific_name,
+          minWater: data.suggestions[0].plant_details.watering?.max,
+          maxWater: data.suggestions[0].plant_details.watering?.min,
+          probability: (data.suggestions[0].probability * 100).toFixed(2),
+          description:
+            data.suggestions[0].plant_details.wiki_description?.value.split(
+              "."
+            )[0],
+          link: data.suggestions[0].plant_details?.url,
+          image: data?.images[0]?.url,
+          wiki_image: data.suggestions[0].plant_details.wiki_image?.value,
+        });
+      }
+    } catch (error) {
+      console.log("ERROR WITH IMAGE");
+      console.log(error);
+      alert(error);
+    }
+  };
 
   const handleUpload = (file: File) => {
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+    const allowedExtensions = ["jpeg", "jpg", "png"];
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert("Only JPEG, JPG, and PNG files are allowed");
+      return;
+    }
     setSelectedImage(file);
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -70,21 +152,18 @@ export default function AddPlant() {
   };
   const handleProceed = () => {
     console.log("proceeding");
-    setStep(2);
+    if (previewImage) {
+      processFileData(previewImage.split("base64,")[1]);
+    }
+    setStep((prevStep) => (prevStep += 1));
+  };
+  const handleGoBack = () => {
+    console.log("going back");
+    setStep((prevStep) => (prevStep -= 1));
   };
   const handleCancel = () => {
     setSelectedImage((prevState) => null);
     setPreviewImage((prevState) => null);
-  };
-  const plantState: Plant = {
-    name: "",
-    nickname: "",
-    plantType: "Outdoor",
-    plantSize: "M",
-    waterNeeded: 15,
-    waterAdded: 0,
-    birthday: "",
-    image: "",
   };
 
   const handlePlantSubmit = (
@@ -96,37 +175,44 @@ export default function AddPlant() {
   };
 
   return (
-    <div className="bg-yellow-500">
+    <div className="bg-red-500 w-full lg:w-4/5 p-2  max-w-[1000px]">
       {step === 1 && (
         <div className="max-w-md mx-auto text-black">
           <header className="bg-blue-500 py-4">
             <div className="max-w-7xl mx-auto px-4">
               <h1 className="text-white text-3xl font-bold">
-                Check out Our New Feature!
+                New Premium Feature!
               </h1>
               <p className="text-white text-lg mt-2">
-                New Feature!: Upload A Picture of Your Plant and Get Plant
+                Upload A Picture of Your Plant and Get AI Suggested Plant
                 Details
               </p>
             </div>
           </header>
-          <label
-            htmlFor="image"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Image Upload
-          </label>
-          <input
-            type="file"
-            id="image"
-            accept="image/*"
-            onChange={(e) => handleUpload(e.target.files && e.target.files[0])}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
+          <div className="w-full">
+            <div className="relative bg-gray-200 p-4 border border-gray-400 rounded cursor-move flex items-center justify-center p-20">
+              <input
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                type="file"
+                id="image"
+                accept="image/*"
+                onChange={(e) =>
+                  handleUpload(e.target.files && e.target.files[0])
+                }
+              />
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Drag or Click to Upload An Image
+              </label>
+            </div>
+          </div>
+
           {previewImage && (
             <div className="fixed inset-0 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg p-6 max-w-md">
-                <h2 className="text-lg font-bold mb-4">Confirm Image Upload</h2>
+                <h2 className="text-lg font-bold mb-4">Confirm Plant Image</h2>
                 <div className="mt-2">
                   <Image
                     src={previewImage}
@@ -136,9 +222,7 @@ export default function AddPlant() {
                     height={500}
                   />
                 </div>
-                <p className="text-gray-600 mb-6">
-                  Are you sure you want to proceed with this image upload?
-                </p>
+                <p className="text-gray-600 mb-6">Is this your new plant?</p>
                 <div className="flex justify-end">
                   <button
                     className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2"
@@ -156,8 +240,9 @@ export default function AddPlant() {
               </div>
             </div>
           )}
-          <p className="text-gray-600 mb-6">Looking for regular UI?</p>
+
           <div className="flex justify-end">
+            <p className="text-gray-600 mb-6">Looking for regular UI?</p>
             <button
               className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2"
               onClick={handleProceed}
@@ -169,60 +254,137 @@ export default function AddPlant() {
       )}
 
       {step === 2 && (
-        <Formik
-          initialValues={plantState}
-          validationSchema={validationSchema}
-          onSubmit={handlePlantSubmit}
-        >
-          {({ isValid, isSubmitting }) => (
-            <Form className="max-w-md mx-auto text-black">
-              {formFields.map((field) => (
-                <div className="mb-4" key={field.name}>
-                  <label
-                    htmlFor={field.name}
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    {field.label}
-                  </label>
-                  {field.type === "select" ? (
-                    <Field
-                      as="select"
-                      id={field.name}
-                      name={field.name}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        <div className="w-full p-5 lg:w=3/5 text-black">
+          {previewImage ? (
+            <div className="flex justify-around gap-2 mb-4">
+              <div className="w=1/3 flex">
+                <Image
+                  src={previewImage}
+                  alt="Preview"
+                  className="max-w-full h-auto rounded-lg"
+                  width={500}
+                  height={500}
+                />
+              </div>
+              <div className="w=3/5">
+                <div className="text-left">
+                  <div className="mb-2">
+                    <h2 className="text-xl font-semibold">
+                      {plantRecommendations?.plant_name}
+                    </h2>
+                  </div>
+                  <div className="mb-2">
+                    <p>
+                      <strong>Plant Type: </strong>
+                      {plantRecommendations?.plant_name}
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <p>
+                      <strong>Plant Match Probability: </strong>
+                      {plantRecommendations?.probability}%
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <p>
+                      <strong>Plant Description: </strong>
+                      {plantRecommendations?.description}
+                    </p>
+                  </div>
+                  <div className="mb-2">
+                    <a
+                      href={plantRecommendations?.link}
+                      target="_blank"
+                      rel="noreferrer"
                     >
-                      {field.options?.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </Field>
-                  ) : (
-                    <Field
-                      type={field.type}
-                      id={field.name}
-                      name={field.name}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                  )}
-                  <ErrorMessage
-                    name={field.name}
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
+                      <p className="text-blue-600">
+                        Visit the Wiki for care tips!
+                      </p>
+                    </a>
+                  </div>
+                  <div className="mb-2">
+                    <p>
+                      <strong>Watering Guidelines: </strong>
+                      {!plantRecommendations?.minWater
+                        ? "Please visit the Wiki for guidance on water care"
+                        : plantRecommendations?.minWater === 1
+                        ? "Your plant doesn't require too much water"
+                        : plantRecommendations?.minWater === 2
+                        ? "Your plant requires a moderate to high amount of water"
+                        : "Your plant needs a lot of water and care, choose carefully!"}
+                    </p>
+                  </div>
                 </div>
-              ))}
-
-              <button
-                type="submit"
-                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                disabled={!isValid || isSubmitting}
-              >
-                Submit
-              </button>
-            </Form>
+              </div>
+            </div>
+          ) : (
+            <></>
           )}
-        </Formik>
+
+          <Formik
+            initialValues={plantState}
+            validationSchema={validationSchema}
+            onSubmit={handlePlantSubmit}
+          >
+            {({ isValid, isSubmitting }) => (
+              <>
+                <Form >
+                  {formFields.map((field) => (
+                    <div className="mb-4" key={field.name}>
+                      <label
+                        htmlFor={field.name}
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        {field.label}
+                      </label>
+                      {field.type === "select" ? (
+                        <Field
+                          as="select"
+                          id={field.name}
+                          name={field.name}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        >
+                          {field.options?.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </Field>
+                      ) : (
+                        <Field
+                          type={field.type}
+                          id={field.name}
+                          name={field.name}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        />
+                      )}
+                      <ErrorMessage
+                        name={field.name}
+                        component="div"
+                        className="text-red-500 text-sm mt-1"
+                      />
+                    </div>
+                  ))}
+                  <button
+                    type="submit"
+                    className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    disabled={!isValid || isSubmitting}
+                  >
+                    Submit
+                  </button>
+                  <div className="flex my-2">
+                    <button
+                      className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2"
+                      onClick={handleGoBack}
+                    >
+                      Go Back
+                    </button>
+                  </div>
+                </Form>
+              </>
+            )}
+          </Formik>
+        </div>
       )}
     </div>
   );
