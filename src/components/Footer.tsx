@@ -1,16 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
-// import { ArrowPathIcon, PlusIcon } from "@heroicons/react/outline";
-
+import {usePathname} from "next/navigation"
 const FooterNav: React.FC = () => {
-  var tab = window.location.pathname
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentTab, setCurrentTab] = useState(tab);
+  const [currentTab, setCurrentTab] = useState("");
+  const tab = usePathname()
   useEffect(()=>{
     isModalOpen ? setCurrentTab("") : setCurrentTab(tab)
   },[isModalOpen,tab])
-
+  
   //find a way to check if logged in or not
   const loggedIn = false;
   const logout = () => {
