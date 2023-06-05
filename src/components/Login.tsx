@@ -19,7 +19,6 @@ const LoginForm: React.FC = () => {
   };
 
   const validationSchema = Yup.object({
-    username: Yup.string().required("Username is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
     password: Yup.string().required("Password is required"),
   });
@@ -29,12 +28,26 @@ const LoginForm: React.FC = () => {
     { label: "Password", name: "password", type: "password" },
   ];
 
-  const handleSubmit = (
+  const handleSubmit = async (
     values: UserLogin,
     { setSubmitting }: FormikHelpers<UserLogin>
   ) => {
     setSubmitting(true);
     console.log("Submitted", values);
+    try {
+      const response = await fetch("/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values), // Replace with your own data
+      });
+      console.log(response)
+      const jsonData = await response.json();
+      console.log(jsonData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   return (
