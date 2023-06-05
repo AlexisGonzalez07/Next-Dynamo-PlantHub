@@ -10,9 +10,18 @@ module.exports = {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
       },
-    },
+      animation: {
+        'pulse-slow': 'pulse-slow 2s infinite'
+      },
+      keyframes: {
+        'pulse-slow': {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0.5 }
+        },
+      }
+    }
   },
   plugins: [],
 }
