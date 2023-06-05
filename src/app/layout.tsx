@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Header from '../components/Header'
 import './globals.css'
 import { Inter } from 'next/font/google'
@@ -19,6 +20,11 @@ function RootLayout({
 
   return (
     <html lang="en">
+      <Head>
+        <title>{metadata.title}</title>
+        <meta name="description" content={metadata.description} />
+        <meta name="google-site-verification" content="5Xzl4EDlS38QJSKo4iDRxcca9-ElZPXPp3lzYiANlo8" />
+      </Head>
       <body className={`min-h-screen flex flex-col items-center justify-between bg-blue-500 ${inter.className}`}>
     <Header />
       <main className="flex-1 bg-orange-500 w-full flex flex-col items-center justify-around">
