@@ -21,7 +21,7 @@ export default function RootLayout({
         className={`min-h-screen flex flex-col items-center justify-between bg-blue-500 ${inter.className}`}
       >
         <Header />
-        <main className="flex-1 bg-orange-500 w-full flex flex-col items-center justify-around">
+        <main className="flex-1 bg-red-500 w-full flex flex-col items-center justify-around">
           {children}
         </main>
         <FooterNav />
