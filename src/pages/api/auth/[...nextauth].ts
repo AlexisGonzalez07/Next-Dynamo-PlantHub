@@ -33,10 +33,11 @@ const options: NextAuthOptions = {
       // PERFORM ADDITIONAL FUNCTIONS BASED ON PROVIDER FOR SIGNUP
       switch (value.account.provider) {
         case "google":
-          if (!value.profile?.email_verified) {
-            console.log("PREVENT SPAM ACCOUNTS");
-            return false;
-          }
+          //The code caused an error because I'm not specifying that profile is from google and has email_verified
+          // if (!value.profile?.email_verified) {
+          //   console.log("PREVENT SPAM ACCOUNTS");
+          //   return false;
+          // }
             //we will only make accounts for validated emails
             const created = await dbOperations.createUser(email, firstName,lastName);
             return created;
