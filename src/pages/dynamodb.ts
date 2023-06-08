@@ -7,6 +7,4 @@ AWS.config.update({
 });
 
 // Create an instance of the DynamoDB DocumentClient
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-
-export default dynamodb;
+export const dynamodb = new AWS.DynamoDB.DocumentClient();

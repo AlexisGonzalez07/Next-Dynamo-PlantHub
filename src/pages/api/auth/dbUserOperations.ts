@@ -1,4 +1,4 @@
-import dynamodb from "../../dynamodb";
+import {dynamodb} from "../../dynamodb";
 
 interface User {
     firstName: string;
