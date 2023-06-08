@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcrypt";
-import dbOperations from "../auth/dbUserOperations";
+import {dbOperations} from "../auth/dbUserOperations";
 
 // POST /api/users/login
 export default async function login(req: NextApiRequest, res: NextApiResponse) {

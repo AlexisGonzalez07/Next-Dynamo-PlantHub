@@ -1,6 +1,6 @@
 import NextAuth, { User, Account, Profile, NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import dbOperations from "./dbUserOperations.ts";
+import {dbOperations} from "./dbUserOperations.ts";
 interface SignInValue {
   user: User | any;
   account: Account;

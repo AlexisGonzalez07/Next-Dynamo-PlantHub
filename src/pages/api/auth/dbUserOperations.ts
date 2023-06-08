@@ -66,6 +66,4 @@ async function createUser(email: string, firstName: string, lastName: string, us
     }
  
 
- const dbOperations = {createUser,getUser}
-
- export default dbOperations
+ export const dbOperations = {createUser,getUser}
