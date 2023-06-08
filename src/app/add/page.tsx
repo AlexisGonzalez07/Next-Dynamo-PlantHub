@@ -150,6 +150,8 @@ export default function AddPlant() {
       setPreviewImage(reader.result as string);
     };
   };
+  console.log("PREVIEW IMAGE!")
+  console.log(previewImage)
   const handleProceed = () => {
     console.log("proceeding");
     if (previewImage) {

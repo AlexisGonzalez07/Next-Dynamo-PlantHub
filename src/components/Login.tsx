@@ -1,6 +1,6 @@
-import { nanoid } from "nanoid";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import { useState } from "react";
 interface UserLogin {
   email: string;
   password: string;
@@ -17,6 +17,7 @@ const LoginForm: React.FC = () => {
     email: "",
     password: "",
   };
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
@@ -34,19 +35,27 @@ const LoginForm: React.FC = () => {
   ) => {
     setSubmitting(true);
     console.log("Submitted", values);
-    try {
-      const response = await fetch("/api/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values), // Replace with your own data
-      });
-      console.log(response)
-      const jsonData = await response.json();
-      console.log(jsonData);
+    try{
+    const response = await fetch("/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values), // Replace with your own data
+    });
+    console.log(response);
+    const data = await response.json();
+    if (data?.error) {
+      //allow resubmission
+      setSubmitting(false);
+      setErrorMessage(data.error);
+    } else {
+      //reload the client after signing the token 
+      console.log("SUCCESS!");
+    }
     } catch (error) {
-      console.error("Error fetching data:", error);
+setErrorMessage(error)
+      setSubmitting(true);
     }
   };
 
@@ -79,6 +88,7 @@ const LoginForm: React.FC = () => {
               />
             </div>
           ))}
+          <h4 className="text-white">{errorMessage}</h4>
 
           <button
             type="submit"

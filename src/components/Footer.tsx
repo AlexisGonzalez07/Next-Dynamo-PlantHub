@@ -1,20 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
-import {usePathname} from "next/navigation"
+import { usePathname } from "next/navigation";
+import { useSession, signOut, getSession } from "next-auth/react";
 const FooterNav: React.FC = () => {
+  const { data: session } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState("");
-  const tab = usePathname()
-  useEffect(()=>{
-    isModalOpen ? setCurrentTab("") : setCurrentTab(tab)
-  },[isModalOpen,tab])
-  
-  //find a way to check if logged in or not
-  const loggedIn = false;
-  const logout = () => {
-    console.log("loggout!");
-  };
+  const tab = usePathname();
+  useEffect(() => {
+    isModalOpen ? setCurrentTab("") : setCurrentTab(tab);
+  }, [isModalOpen, tab]);
+
+  useEffect(() => {
+    !session ? openModal() : closeModal() 
+  }, [session]);
+
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -27,58 +28,58 @@ const FooterNav: React.FC = () => {
       className={`fixed inset-x-0 bottom-6 lg:bottom-10 xl:bottom-12 z-50 flex justify-center`}
     >
       <nav className="bg-gray-800 p-4 w-full lg:w-4/5 flex justify-around">
-          <a
-            href="/"
-            className={`${
-              currentTab === "/" ? "animate-pulse" : ""
-            } text-white text-lg flex flex-col items-center justify-center hover:text-gray-300 transition-all duration-300`}
+        <a
+          href="/"
+          className={`${
+            currentTab === "/" ? "animate-pulse" : ""
+          } text-white text-lg flex flex-col items-center justify-center hover:text-gray-300 transition-all duration-300`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-              />
-            </svg>
-            <span className="text-xs">Home</span>
-          </a>
-          <a
-            href="/add"
-            className={`${
-              currentTab === "/add" ? "animate-pulse" : ""
-            } text-white text-lg flex flex-col items-center justify-center hover:text-gray-300 transition-all duration-300`}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+            />
+          </svg>
+          <span className="text-xs">Home</span>
+        </a>
+        <a
+          href="/add"
+          className={`${
+            currentTab === "/add" ? "animate-pulse" : ""
+          } text-white text-lg flex flex-col items-center justify-center hover:text-gray-300 transition-all duration-300`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
 
-            <span className="text-xs">Add Plant</span>
-          </a>
+          <span className="text-xs">Add Plant</span>
+        </a>
         <button
-          onClick={() => (loggedIn ? logout() : openModal())}
+          onClick={() => (session ? signOut() : openModal())}
           className={`${
             currentTab === "" && "animate-pulse"
           } text-white text-lg flex flex-col items-center justify-center hover:text-gray-300 transition-all duration-300`}
         >
-          {loggedIn ? (
+          {session ? (
             <>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -124,3 +125,10 @@ const FooterNav: React.FC = () => {
   );
 };
 export default FooterNav;
+
+// export const getServerSideProps = async(context) => {
+//   const session = await getSession(context)
+//   return {
+//     props:{session},
+//   }
+// }
