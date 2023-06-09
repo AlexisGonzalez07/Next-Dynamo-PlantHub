@@ -1,75 +1,84 @@
-import { nanoid } from "nanoid";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 import * as Yup from "yup";
-interface User {
+
+interface SignUpUser {
   firstName: string;
   lastName: string;
   username: string;
   email: string;
   password: string;
-}
-
-interface SignUpUser extends User {
   confirmPassword: string;
 }
-
 interface FormField {
   label: string;
   name: keyof SignUpUser;
   type: string;
 }
 
+const validationSchema = Yup.object({
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  firstName: Yup.string()
+    .min(2, "First name must have at least 2 characters")
+    .required("First name is required"),
+  lastName: Yup.string()
+    .min(2, "Last name must have at least 2 characters")
+    .required("Last name is required"),
+  username: Yup.string(),
+  password: Yup.string()
+    .matches(
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+      "Password must be at least 8 characters long and contain a combination of letters, numbers, and special characters"
+    )
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Confirm password is required"),
+});
+
+const formFields: FormField[] = [
+  { label: "Email *", name: "email", type: "email" },
+  { label: "First Name *", name: "firstName", type: "text" },
+  { label: "Last Name *", name: "lastName", type: "text" },
+  { label: "Username", name: "username", type: "text" },
+  { label: "Password *", name: "password", type: "password" },
+  { label: "Confirm Password *", name: "confirmPassword", type: "password" },
+];
+
+const initialState: SignUpUser = {
+  email: "",
+  firstName: "",
+  lastName: "",
+  username: "",
+  password: "",
+  confirmPassword: "",
+};
 const SignUpForm: React.FC = () => {
-  const initialState: SignUpUser = {
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  };
-
-  const validationSchema = Yup.object({
-    firstName: Yup.string().required("First name is required"),
-    lastName: Yup.string().required("Last name is required"),
-    username: Yup.string().required("Username is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().required("Password is required"),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm password is required"),
-  });
-
-  const formFields: FormField[] = [
-    { label: "First Name", name: "firstName", type: "text" },
-    { label: "Last Name", name: "lastName", type: "text" },
-    { label: "Username", name: "username", type: "text" },
-    { label: "Email", name: "email", type: "email" },
-    { label: "Password", name: "password", type: "password" },
-    { label: "Confirm Password", name: "confirmPassword", type: "password" },
-  ];
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleSubmit = async (
     values: SignUpUser,
     { setSubmitting }: FormikHelpers<SignUpUser>
   ) => {
     setSubmitting(true);
-    console.log("Submitted", values);
-    try {
-      const response = await fetch("/api/users/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values), // Replace with your own data
+    const { email, firstName, lastName, username, password, confirmPassword } =
+      values;
+      const result = await signIn("credentials", {
+        email,
+        firstName,
+        lastName,
+        username,
+        password,
+        confirmPassword,
+        redirect: false,
       });
-      console.log(response)
-      const jsonData = await response.json();
-      console.log(jsonData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      console.log(result);
+      if(result.error){
+        setErrorMessage(result.error)
+        setSubmitting(false)
+      }
     }
-  };
 
   return (
     <Formik
@@ -100,7 +109,7 @@ const SignUpForm: React.FC = () => {
               />
             </div>
           ))}
-
+          <h4 className="text-white">{errorMessage}</h4>
           <button
             type="submit"
             className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

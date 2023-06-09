@@ -22,13 +22,15 @@
         "name": "next"
       }
     ],
+    "strictNullChecks": false,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/utils/dynamodb.ts"  ],
   "exclude": [
     "node_modules"
   ]

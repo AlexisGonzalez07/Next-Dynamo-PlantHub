@@ -1,52 +1,53 @@
-import { nanoid } from "nanoid";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 interface UserLogin {
   email: string;
   password: string;
 }
-
 interface FormField {
   label: string;
   name: keyof UserLogin;
   type: string;
 }
+const initialState: UserLogin = {
+  email: "",
+  password: "",
+};
+
+const validationSchema = Yup.object({
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  password: Yup.string()
+    .matches(
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+      "Password must be at least 8 characters long and contain a combination of letters, numbers, and special characters"
+    )
+    .required("Password is required"),
+});
+
+const formFields: FormField[] = [
+  { label: "Email", name: "email", type: "email" },
+  { label: "Password", name: "password", type: "password" },
+];
 
 const LoginForm: React.FC = () => {
-  const initialState: UserLogin = {
-    email: "",
-    password: "",
-  };
-
-  const validationSchema = Yup.object({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().required("Password is required"),
-  });
-
-  const formFields: FormField[] = [
-    { label: "Email", name: "email", type: "email" },
-    { label: "Password", name: "password", type: "password" },
-  ];
-
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const handleSubmit = async (
     values: UserLogin,
     { setSubmitting }: FormikHelpers<UserLogin>
   ) => {
     setSubmitting(true);
-    console.log("Submitted", values);
-    try {
-      const response = await fetch("/api/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values), // Replace with your own data
-      });
-      console.log(response)
-      const jsonData = await response.json();
-      console.log(jsonData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    const { email, password } = values;
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+    console.log(result);
+    if (result.error) {
+      setErrorMessage(result.error);
+      setSubmitting(false);
     }
   };
 
@@ -79,6 +80,7 @@ const LoginForm: React.FC = () => {
               />
             </div>
           ))}
+          <h4 className="text-white">{errorMessage}</h4>
 
           <button
             type="submit"
