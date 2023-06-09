@@ -30,7 +30,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/pages/dynamodb.ts"  ],
+, "src/utils/dynamodb.ts"  ],
   "exclude": [
     "node_modules"
   ]

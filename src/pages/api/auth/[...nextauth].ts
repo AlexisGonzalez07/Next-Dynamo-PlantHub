@@ -1,7 +1,7 @@
 import NextAuth, { User, Account, Profile, NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import {getUser,createUser} from "../../dynamodb.ts"
+import {getUser,createUser} from "../../../utils/dynamodb.ts"
 import { protocol } from "./providerProtocol.ts";
 import bcrypt from "bcrypt";
 

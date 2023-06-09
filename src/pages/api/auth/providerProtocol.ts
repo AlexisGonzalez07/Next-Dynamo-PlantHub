@@ -1,5 +1,5 @@
 import { User } from "next-auth";
-import {getUser, createUser} from "../../dynamodb"
+import {getUser, createUser} from "../../../utils/dynamodb"
 
 
 export const protocol = {
