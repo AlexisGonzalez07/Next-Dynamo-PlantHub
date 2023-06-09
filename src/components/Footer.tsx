@@ -18,6 +18,7 @@ const FooterNav: React.FC = () => {
     console.log(response)
     const responseData = await response.json()
     console.log(responseData)
+    signOut()
   }
   useEffect(() => {
     isModalOpen ? setCurrentTab("") : setCurrentTab(tab);
