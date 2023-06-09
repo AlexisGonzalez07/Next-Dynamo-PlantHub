@@ -2,6 +2,7 @@ import { User } from "next-auth";
 import {getUser, createUser} from "../../../utils/dynamodb"
 
 
+
 export const protocol = {
   async google(user: User | any) {
     const email = user.email;

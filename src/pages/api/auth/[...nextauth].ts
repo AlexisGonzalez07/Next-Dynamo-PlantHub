@@ -1,10 +1,9 @@
 import NextAuth, { User, Account, Profile, NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import {getUser,createUser} from "../../../utils/dynamodb.ts"
+import { getUser, createUser } from "../../../utils/dynamodb.ts";
 import { protocol } from "./providerProtocol.ts";
 import bcrypt from "bcrypt";
-
 interface SignInValue {
   user: User | any;
   account: Account;
@@ -38,7 +37,7 @@ const options: NextAuthOptions = {
         const user = await getUser(email);
         //this should mean that they're signing up.
         if (!user && confirmPassword) {
-          console.log('USER WAS NOT FOUND AND MAKING NEW USER')
+          console.log("USER WAS NOT FOUND AND MAKING NEW USER");
           const salt = await bcrypt.genSalt(10);
           const created = await createUser(
             email,
@@ -50,17 +49,17 @@ const options: NextAuthOptions = {
           if (!created) {
             throw new Error("Unable to sign up");
           }
-          return { email, username, id:"1" };
+          return null;
         }
         if (!user) {
           //this means no user found
-          console.log('USER WAS NOT FOUND')
+          console.log("USER WAS NOT FOUND");
 
           throw new Error("Invalid login credentials");
         }
         //means that they used an auth provider to sign up before, and must authenticate through their OAUTH login view
         if (!user?.password) {
-          console.log('USER WAS FOUND but through AUTH')
+          console.log("USER WAS FOUND but through AUTH");
           throw new Error(
             "It looks like this email was registered through an Auth partner. To protect your account, please login through our partner portal and set your password through your account portal"
           );
@@ -70,8 +69,9 @@ const options: NextAuthOptions = {
           //invalid password catch
           throw new Error("Invalid login credentials");
         }
+
         //I have a valid user
-        return { email, username: user.username, id:"1" };
+        return null;
       },
     }),
   ],
@@ -89,7 +89,7 @@ const options: NextAuthOptions = {
         default:
           return true;
       }
-    }
+    },
   },
 };
 export default NextAuth(options);
