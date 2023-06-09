@@ -55,7 +55,6 @@ const formFields: FormField[] = [
 ];
 
 export default function AddPlant() {
-  console.log(process.env.NEXT_PUBLIC_PLANT_API_URL);
   const [step, setStep] = useState(1);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -71,8 +70,6 @@ export default function AddPlant() {
     image: "",
   };
   const [plantState, setPlantState] = useState(plantForm);
-  console.log(plantRecommendations);
-  console.log(plantState);
   useEffect(() => {
     if (plantRecommendations === null) {
       return;
@@ -192,7 +189,7 @@ export default function AddPlant() {
             </div>
           </header>
           <div className="w-full">
-            <div className="relative bg-gray-200 p-4 border border-gray-400 rounded cursor-move flex items-center justify-center p-20">
+            <div className="relative bg-gray-200 border border-gray-400 rounded cursor-move flex items-center justify-center p-20">
               <input
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 type="file"

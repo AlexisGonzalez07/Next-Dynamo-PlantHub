@@ -12,10 +12,6 @@ const FooterNav: React.FC = () => {
     isModalOpen ? setCurrentTab("") : setCurrentTab(tab);
   }, [isModalOpen, tab]);
 
-  useEffect(() => {
-    !session ? openModal() : closeModal() 
-  }, [session]);
-
   const openModal = () => {
     setIsModalOpen(true);
   };
