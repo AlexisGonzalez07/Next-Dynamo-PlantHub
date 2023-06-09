@@ -2,7 +2,7 @@
 import { useState, useEffect, useContext } from "react";
 import Modal from "./Modal";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { UserContext } from "../app/providers";
 const FooterNav: React.FC = () => {
   const {data} = useContext(UserContext)

@@ -6,7 +6,7 @@ import Image from "next/image";
 import axios from "axios";
 import { UserContext } from "../providers";
 import { nanoid } from "nanoid";
-
+import { useRouter } from 'next/navigation'
 interface Plant {
   name: string;
   nickname?: string;
@@ -59,8 +59,9 @@ const formFields: FormField[] = [
 ];
 
 export default function AddPlant() {
-  const { data, updateUserData } = useContext(UserContext);
-  console.log(data)
+  const { data, loading, updateUserData } = useContext(UserContext);
+    const router = useRouter()  
+    console.log(router)
   const [step, setStep] = useState(1);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [plantRecommendations, setPlantRecommendations] = useState(null);
@@ -113,7 +114,6 @@ export default function AddPlant() {
         }
       );
       const { data } = response;
-      console.log(data);
       if (response.status !== 200) {
         alert("COULDN'T PROCESS IMAGE");
         return;
@@ -153,8 +153,7 @@ export default function AddPlant() {
       setPreviewImage(reader.result as string);
     };
   };
-  console.log("PREVIEW IMAGE!");
-  console.log(previewImage);
+
   const handleProceed = () => {
     console.log("proceeding");
     if (previewImage) {
@@ -189,21 +188,20 @@ export default function AddPlant() {
     if(plantRecommendations){
      finalPlant.image = plantRecommendations.image
     }
-    console.log(finalPlant)
     if(data){
-     const newData =  data
-     newData.plants.push(finalPlant)
-     console.log(newData)
-     updateUserData(newData)
+     data.plants.push(finalPlant)
+     updateUserData(data)
+      router.replace("/")
+    //  setSubmitting(false)
     } else {
-      // Prompt the user to log in!?
-      console.log("invalid add")
+     alert("ONLY LOGGED IN USERS CAN ADD A PLANT")
+     setSubmitting(false)
     }
-    const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' };
-    const dateToFormat = new Date(finalPlant.birthday * 1000)
-    const formattedDate = dateToFormat.toLocaleDateString('en-US', options);
-
   };
+
+  if(loading){
+    return <h1>Loading...</h1>
+  }
 
   return (
     <div className="bg-red-500 w-full lg:w-4/5 p-2  max-w-[1000px]">

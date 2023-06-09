@@ -19,7 +19,7 @@ export const UserContext = createContext<UserContextData>({
   data: null,
   loading: false,
   error: null,
-  updateUserData: () => {}
+  updateUserData: () => {},
 });
 
 const IDBProvider = ({ children }: ProvidersProps) => {
@@ -38,11 +38,13 @@ const IDBProvider = ({ children }: ProvidersProps) => {
         const userInfo = await readUser(session?.user?.email);
         // This means it's the user's first time.
         if (!userInfo?.firstName) {
-          const response = await fetch(`/api/user?email=${session?.user?.email}`);
+          const response = await fetch(
+            `/api/user?email=${session?.user?.email}`
+          );
           const newUser = await response.json();
           return updateUserData(newUser);
         }
-        
+
         setData(userInfo);
       } catch (error) {
         setError(error);
@@ -57,7 +59,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   const updateUserData = async (user) => {
     try {
       setLoading(true);
-      setError(null);  
+      setError(null);
       await writeUser(user);
       setData(user);
     } catch (error) {
@@ -77,10 +79,11 @@ const IDBProvider = ({ children }: ProvidersProps) => {
 
 export default function Providers({ children }: ProvidersProps) {
 
+
   return (
-    
     <SessionProvider>
-      <IDBProvider>{children}</IDBProvider>
+      <IDBProvider>
+{children}      </IDBProvider>
     </SessionProvider>
   );
 }
