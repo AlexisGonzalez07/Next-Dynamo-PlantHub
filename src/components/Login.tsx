@@ -1,61 +1,53 @@
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 interface UserLogin {
   email: string;
   password: string;
 }
-
 interface FormField {
   label: string;
   name: keyof UserLogin;
   type: string;
 }
+const initialState: UserLogin = {
+  email: "",
+  password: "",
+};
+
+const validationSchema = Yup.object({
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  password: Yup.string()
+    .matches(
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+      "Password must be at least 8 characters long and contain a combination of letters, numbers, and special characters"
+    )
+    .required("Password is required"),
+});
+
+const formFields: FormField[] = [
+  { label: "Email", name: "email", type: "email" },
+  { label: "Password", name: "password", type: "password" },
+];
 
 const LoginForm: React.FC = () => {
-  const initialState: UserLogin = {
-    email: "",
-    password: "",
-  };
   const [errorMessage, setErrorMessage] = useState<string>("");
-
-  const validationSchema = Yup.object({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().required("Password is required"),
-  });
-
-  const formFields: FormField[] = [
-    { label: "Email", name: "email", type: "email" },
-    { label: "Password", name: "password", type: "password" },
-  ];
-
   const handleSubmit = async (
     values: UserLogin,
     { setSubmitting }: FormikHelpers<UserLogin>
   ) => {
     setSubmitting(true);
-    console.log("Submitted", values);
-    try{
-    const response = await fetch("/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values), // Replace with your own data
+    const { email, password } = values;
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
     });
-    console.log(response);
-    const data = await response.json();
-    if (data?.error) {
-      //allow resubmission
+    console.log(result);
+    if (result.error) {
+      setErrorMessage(result.error);
       setSubmitting(false);
-      setErrorMessage(data.error);
-    } else {
-      //reload the client after signing the token 
-      console.log("SUCCESS!");
-    }
-    } catch (error) {
-setErrorMessage(error)
-      setSubmitting(true);
     }
   };
 

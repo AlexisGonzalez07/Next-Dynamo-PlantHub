@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { usePathname } from "next/navigation";
-import { useSession, signOut, getSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 const FooterNav: React.FC = () => {
   const { data: session } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);

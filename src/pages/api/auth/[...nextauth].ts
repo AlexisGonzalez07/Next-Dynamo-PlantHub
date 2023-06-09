@@ -1,6 +1,10 @@
 import NextAuth, { User, Account, Profile, NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import {dbOperations} from "./dbUserOperations.ts";
+import CredentialsProvider from "next-auth/providers/credentials";
+import {getUser,createUser} from "../../dynamodb.ts"
+import { protocol } from "./providerProtocol.ts";
+import bcrypt from "bcrypt";
+
 interface SignInValue {
   user: User | any;
   account: Account;
@@ -12,25 +16,68 @@ const options: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        firstName: { label: "First Name", type: "text" },
+        lastName: { label: "Last Name", type: "text" },
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" },
+        confirmPassword: { label: "Confirm Password", type: "password" },
+      },
+      authorize: async (credentials) => {
+        const {
+          email,
+          firstName,
+          lastName,
+          username,
+          password,
+          confirmPassword,
+        } = credentials;
+        const user = await getUser(email);
+        //this should mean that they're signing up.
+        if (!user && confirmPassword) {
+          console.log('USER WAS NOT FOUND AND MAKING NEW USER')
+          const salt = await bcrypt.genSalt(10);
+          const created = await createUser(
+            email,
+            firstName,
+            lastName,
+            username,
+            await bcrypt.hash(password, salt)
+          );
+          if (!created) {
+            throw new Error("Unable to sign up");
+          }
+          return { email, username, id:"1" };
+        }
+        if (!user) {
+          //this means no user found
+          console.log('USER WAS NOT FOUND')
+
+          throw new Error("Invalid login credentials");
+        }
+        //means that they used an auth provider to sign up before, and must authenticate through their OAUTH login view
+        if (!user?.password) {
+          console.log('USER WAS FOUND but through AUTH')
+          throw new Error(
+            "It looks like this email was registered through an Auth partner. To protect your account, please login through our partner portal and set your password through your account portal"
+          );
+        }
+        var validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+          //invalid password catch
+          throw new Error("Invalid login credentials");
+        }
+        //I have a valid user
+        return { email, username: user.username, id:"1" };
+      },
+    }),
   ],
   secret: process.env.JWT_SECRET,
   callbacks: {
     async signIn(value: SignInValue) {
-      const email = value?.user?.email;
-      //no user found
-      if (!email) {
-        return false;
-      }
-      //check if user in db
-      const user = await dbOperations.getUser(email);
-      console.log(user);
-      if (user?.email) {
-        //want to add a check so if the user hasn't added a password, they can be notified to add password on front end
-        return true;
-      }
-      const firstName = value.user.name.trim().split(' ')[0]
-      const lastName = value.user.name.trim().split(' ')[1]
-      // PERFORM ADDITIONAL FUNCTIONS BASED ON PROVIDER FOR SIGNUP
       switch (value.account.provider) {
         case "google":
           //The code caused an error because I'm not specifying that profile is from google and has email_verified
@@ -38,14 +85,11 @@ const options: NextAuthOptions = {
           //   console.log("PREVENT SPAM ACCOUNTS");
           //   return false;
           // }
-            //we will only make accounts for validated emails
-            const created = await dbOperations.createUser(email, firstName,lastName);
-            return created;
+          return protocol.google(value.user);
         default:
           return true;
       }
-    },
-
+    }
   },
 };
 export default NextAuth(options);
