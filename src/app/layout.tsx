@@ -23,13 +23,15 @@ export default function RootLayout({
       </head>
       <Providers>
       <body
-        className={`min-h-screen flex flex-col items-center justify-between bg-blue-500 ${inter.className}`}
+        className={`min-w-screen ${inter.className} flex justify-center`}
         >
+          <div className="min-h-screen w-full 2xl:w-4/5 flex flex-col items-center">
         <Header />
         <main className="flex-1 bg-red-500 w-full flex flex-col items-center justify-around">
           {children}
         </main>
         <FooterNav />
+          </div>
       </body>
         </Providers>
     </html>

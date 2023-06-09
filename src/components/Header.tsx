@@ -1,6 +1,6 @@
 const Header: React.FC = () => {
     return (
-      <header className="bg-green-500">
+      <header >
         Header
       </header>
     );

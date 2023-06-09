@@ -1,9 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import Image from "next/image";
 import axios from "axios";
+import { UserContext } from "../providers";
+import { nanoid } from "nanoid";
 
 interface Plant {
   name: string;
@@ -12,8 +14,10 @@ interface Plant {
   plantSize: "L" | "M" | "S";
   waterNeeded: number;
   waterAdded?: number;
-  birthday: string;
+  birthday: string | Date;
   image?: string;
+  id?: string;
+  new: boolean
 }
 
 interface FormField {
@@ -55,8 +59,9 @@ const formFields: FormField[] = [
 ];
 
 export default function AddPlant() {
+  const { data, updateUserData } = useContext(UserContext);
+  console.log(data)
   const [step, setStep] = useState(1);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [plantRecommendations, setPlantRecommendations] = useState(null);
   const plantForm: Plant = {
@@ -68,6 +73,7 @@ export default function AddPlant() {
     waterAdded: 0,
     birthday: "",
     image: "",
+    new: true,
   };
   const [plantState, setPlantState] = useState(plantForm);
   useEffect(() => {
@@ -79,7 +85,8 @@ export default function AddPlant() {
       ...prevState,
       name: plantRecommendations.plant_name,
       waterNeeded: neededWater || 15,
-      image: plantRecommendations.image || plantRecommendations.wiki_image || "",
+      image:
+        plantRecommendations.image || plantRecommendations.wiki_image || "",
     }));
   }, [plantRecommendations]);
 
@@ -140,15 +147,14 @@ export default function AddPlant() {
       alert("Only JPEG, JPG, and PNG files are allowed");
       return;
     }
-    setSelectedImage(file);
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       setPreviewImage(reader.result as string);
     };
   };
-  console.log("PREVIEW IMAGE!")
-  console.log(previewImage)
+  console.log("PREVIEW IMAGE!");
+  console.log(previewImage);
   const handleProceed = () => {
     console.log("proceeding");
     if (previewImage) {
@@ -161,7 +167,6 @@ export default function AddPlant() {
     setStep((prevStep) => (prevStep -= 1));
   };
   const handleCancel = () => {
-    setSelectedImage((prevState) => null);
     setPreviewImage((prevState) => null);
   };
 
@@ -171,6 +176,33 @@ export default function AddPlant() {
   ) => {
     setSubmitting(true);
     console.log("Submitted", values);
+    const date = new Date(values.birthday);
+    const timestamp = date.getTime() / 1000; // Divide by 1000 to convert milliseconds to seconds
+    const finalPlant = {...values, birthday: timestamp, id: nanoid()}
+    // calculate waterAdded based on the current date
+    const currentDate = new Date();
+    const currentDayOfMonth = currentDate.getDate();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const numberOfDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    finalPlant.waterAdded = Math.floor(finalPlant.waterNeeded * (currentDayOfMonth / numberOfDaysInMonth));
+    if(plantRecommendations){
+     finalPlant.image = plantRecommendations.image
+    }
+    console.log(finalPlant)
+    if(data){
+     const newData =  data
+     newData.plants.push(finalPlant)
+     console.log(newData)
+     updateUserData(newData)
+    } else {
+      // Prompt the user to log in!?
+      console.log("invalid add")
+    }
+    const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' };
+    const dateToFormat = new Date(finalPlant.birthday * 1000)
+    const formattedDate = dateToFormat.toLocaleDateString('en-US', options);
+
   };
 
   return (
@@ -327,7 +359,7 @@ export default function AddPlant() {
           >
             {({ isValid, isSubmitting }) => (
               <>
-                <Form >
+                <Form>
                   {formFields.map((field) => (
                     <div className="mb-4" key={field.name}>
                       <label
