@@ -1,13 +1,24 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Modal from "./Modal";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import { UserContext } from "../app/providers";
 const FooterNav: React.FC = () => {
-  const { data: session } = useSession();
+  const {data} = useContext(UserContext)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState("");
   const tab = usePathname();
+  const handleSignOut = async () => {
+    console.log(data)
+    const response = await fetch(`/api/user?email=${data.email}`,{
+      method: "POST",
+      body: JSON.stringify(data)
+    })
+    console.log(response)
+    const responseData = await response.json()
+    console.log(responseData)
+  }
   useEffect(() => {
     isModalOpen ? setCurrentTab("") : setCurrentTab(tab);
   }, [isModalOpen, tab]);
@@ -20,10 +31,8 @@ const FooterNav: React.FC = () => {
     setIsModalOpen(false);
   };
   return (
-    <footer
-      className={`fixed inset-x-0 bottom-6 lg:bottom-10 xl:bottom-12 z-50 flex justify-center`}
-    >
-      <nav className="bg-gray-800 p-4 w-full lg:w-4/5 flex justify-around">
+
+      <nav className="bg-gray-800 p-4 w-full flex justify-around">
         <a
           href="/"
           className={`${
@@ -70,12 +79,12 @@ const FooterNav: React.FC = () => {
           <span className="text-xs">Add Plant</span>
         </a>
         <button
-          onClick={() => (session ? signOut() : openModal())}
+          onClick={() => (data ? handleSignOut() : openModal())}
           className={`${
             currentTab === "" && "animate-pulse"
           } text-white text-lg flex flex-col items-center justify-center hover:text-gray-300 transition-all duration-300`}
         >
-          {session ? (
+          {data ? (
             <>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -115,16 +124,8 @@ const FooterNav: React.FC = () => {
             </>
           )}
         </button>
-      </nav>
       <Modal isOpen={isModalOpen} onClose={closeModal} />
-    </footer>
+      </nav>
   );
 };
 export default FooterNav;
-
-// export const getServerSideProps = async(context) => {
-//   const session = await getSession(context)
-//   return {
-//     props:{session},
-//   }
-// }
