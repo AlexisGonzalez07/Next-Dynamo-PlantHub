@@ -4,7 +4,9 @@ import { UserContext } from './providers'
 import PlantCard from '../components/PlantCard'
 export default function Home() {
   const {data,loading,error} = useContext(UserContext)
-
+  if(error){
+    return <h1>Error Screen Home</h1>
+  }
   if(!data){
     return(<div>
       <section>Preview Stuff!</section>

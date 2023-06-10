@@ -19,6 +19,7 @@ export default function RootLayout({
           name="google-site-verification"
           content="5Xzl4EDlS38QJSKo4iDRxcca9-ElZPXPp3lzYiANlo8"
         />
+        <link rel="manifest" href="./manifest.json" />
       </head>
       <Providers>
         <body className={`min-w-screen ${inter.className} flex justify-center`}>
