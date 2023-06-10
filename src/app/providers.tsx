@@ -31,26 +31,27 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { data: session, status } = useSession(); // Access session information
-  console.log(data);
-  console.log(loading);
-  console.log(error);
+  console.log(data)
+  console.log(loading)
+  console.log(error)
+  console.log(session)
+  console.log(status)
   useEffect(() => {
+    if(status !== "authenticated" ){
+      return
+    }
     const fetchData = async () => {
+      console.log("THE FETCH DATA HOOK RUNNING BC SESSION AUTHORIZED")
       setLoading(true);
       setError(null);
       try {
-        if (!session) {
-          return;
-        }
         const userInfo = await readUser(session?.user?.email);
         // This means it's the user's first time.
         if (!userInfo?.firstName) {
           const response = await fetch(
             `/api/user?email=${session?.user?.email}`
           );
-          console.log(response);
           const newUser = await response.json();
-          console.log(newUser);
           return updateUserData(newUser);
         }
         setData(userInfo);
@@ -60,26 +61,26 @@ const IDBProvider = ({ children }: ProvidersProps) => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [session]);
 
   useEffect(() => {
-    if (session) {
-      return;
+    if(status === "authenticated" || data!==null){
+      return
     }
-    console.log("YOU CAN STILL SAVE THE OFFLINE HERE!");
     const tryLastLoggedIn = async () => {
+      console.log("THE TRY LAST LOGGIN RAN BC LOADING ALLTHOUGH LOADING IS CURRENTLY TRUE, SESSION IS NULL, OR DATA IS NULL")
       //This should be await read last logged in token for still available?
       const userInfo = await readLastLogged();
       if (!userInfo) {
         setError("Offline or Unauthenticated");
+        setLoading(false)
+        return
       }
       //if there's a user, we can get these user credentials and their expiration date.
       function isTokenValid(dateString) {
         const currentDate = new Date();
         const targetDate = new Date(dateString);
-
         return currentDate.getTime() < targetDate.getTime();
       }
       const targetDate = "2023-07-10T06:43:46.029Z";
@@ -87,6 +88,8 @@ const IDBProvider = ({ children }: ProvidersProps) => {
       const validToken = isTokenValid(targetDate);
       if (!validToken) {
         setError("Offline or Unauthenticated");
+        setLoading(false)
+        return
       }
       const userInPrimary = await readUser(userInfo.email);
       return updateUserData(userInPrimary);
@@ -95,6 +98,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   }, [loading, session]);
 
   const updateUserData = async (user) => {
+    console.log("THE UPDATE USER DATA RUNNING")
     try {
       setLoading(true);
       setError(null);
@@ -125,7 +129,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
 export default function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
-      <IDBProvider>{children} </IDBProvider>
+      <IDBProvider>{children}</IDBProvider>
     </SessionProvider>
   );
 }
