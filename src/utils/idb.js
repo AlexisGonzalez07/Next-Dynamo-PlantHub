@@ -86,6 +86,31 @@ const openBackUpDB = () => {
   });
 };
 
+export const resetBackupDB = async () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("backup", 1);
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+
+      // Delete the object store if it already exists
+      if (db.objectStoreNames.contains("last_user")) {
+        db.deleteObjectStore("last_user");
+      }
+      const objectStore = db.createObjectStore("last_user");
+    };
+
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+      resolve(db);
+    };
+
+    request.onerror = (event) => {
+      reject(event.target.error);
+    };
+  });
+};
+
 // Function to read the last logged-in user from the database
 export const readLastLogged = async () => {
   const db = await openBackUpDB();
