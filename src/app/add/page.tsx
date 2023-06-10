@@ -59,7 +59,7 @@ const formFields: FormField[] = [
 ];
 
 export default function AddPlant() {
-  const { data, loading, updateUserData } = useContext(UserContext);
+  const { data, loading, error, updateUserData } = useContext(UserContext);
     const router = useRouter()  
     console.log(router)
   const [step, setStep] = useState(1);
@@ -203,6 +203,9 @@ export default function AddPlant() {
     return <h1>Loading...</h1>
   }
 
+  if(error){
+    return <h1>Error Screen</h1>
+  }
   return (
     <div className="bg-red-500 w-full lg:w-4/5 p-2  max-w-[1000px]">
       {step === 1 && (
