@@ -12,8 +12,8 @@ const PrivacyPolicy = (props: Props) => {
         </p>
 
         <p>
-          This Privacy Policy sets forth the policies of Next Dynamo Planthub
-          ("we", "us", or "our") regarding the collection, use, and disclosure
+          This Privacy Policy sets forth the policies of Next Dynamo Planthub -
+          "we", "us", or "our" - regarding the collection, use, and disclosure
           of user information when you use our services. We are committed to
           protecting your privacy and handling your personal information with
           utmost care. By accessing or using our services, you agree to the
