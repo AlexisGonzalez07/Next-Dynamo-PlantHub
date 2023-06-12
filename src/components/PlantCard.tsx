@@ -72,7 +72,7 @@ const PlantCard: React.FC<PlantCardProps> = ({ card }) => {
   return (
     <div className="card lg:card-side bg-secondary shadow-xl ">
       <figure >
-        <img src={card.image} alt={card.name} className="lg:max-h-96"/>
+        <img src={card.image || "/modernPlant.jpg"} alt={card.name} className="max-w-96 max-h-96"/>
       </figure>
       <div className="card-body text-primary px-1">
         <h2 className="card-title">

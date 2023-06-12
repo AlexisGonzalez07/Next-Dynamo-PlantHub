@@ -33,6 +33,11 @@
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable"
+        },
+        {
+            "src": "/modernPlant.jpg",
+            "sizes": "512x512",
+            "type": "image/jpg"
         }
     
     ]
