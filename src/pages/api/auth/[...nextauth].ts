@@ -44,7 +44,7 @@ const options: NextAuthOptions = {
             firstName,
             lastName,
             username,
-            await bcrypt.hash(password, salt)
+            await bcrypt.hash(password, salt),
           );
           if (!created) {
             throw new Error("Unable to sign up");

@@ -37,7 +37,8 @@ export async function getUser(email: string) {
   }
 }
 
-export async function createUser(email: string, firstName: string, lastName: string, username?: string, password?: string){
+export async function createUser(email: string, firstName: string, lastName: string, username?: string, password?: string,){
+  const date = Date.now()
   const params = {
       TableName: process.env.AWS_DYNAMO_TABLE,
       Item: {
@@ -46,7 +47,8 @@ export async function createUser(email: string, firstName: string, lastName: str
         lastName,
         username:  username || firstName,
         password: password || "",
-        plants:"[]" // Empty JSON array attribute
+        plants:"[]", // Empty JSON array attribute
+        createdAt: date 
       },
     };
     try {
