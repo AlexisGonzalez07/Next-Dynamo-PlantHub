@@ -85,6 +85,7 @@ const options: NextAuthOptions = {
           //   console.log("PREVENT SPAM ACCOUNTS");
           //   return false;
           // }
+          console.log(value)
           return protocol.google(value.user);
         default:
           return true;

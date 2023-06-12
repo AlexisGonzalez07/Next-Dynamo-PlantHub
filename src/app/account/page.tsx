@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { UserContext, ThemeContext } from "../providers";
 import Loading from "../../components/Loading";
@@ -9,9 +9,11 @@ export default function Home() {
   const { data, loading, error } = useContext(UserContext);
   const [checkedTab, setCheckedTab] = useState<String>("");
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const { status } = useSession();
-
-  if (error === "Offline or Unauthenticated") {
+  useEffect(()=>{
+    console.log("rerender")
+    console.log(data)
+  },[data,error,loading])
+  if (!data && error === "Offline or Unauthenticated") {
     return <Credentials />;
   } else if (error) {
     return <h1>Undiagnozed accound error</h1>;
@@ -22,9 +24,6 @@ export default function Home() {
         <Loading />
       </>
     );
-  }
-  if (status !== "authenticated") {
-    return <Credentials />;
   }
 
   const handleCheckBoxChange = (section: string) => {
@@ -44,6 +43,7 @@ export default function Home() {
     } catch (error) {
       console.log("didn't empty credentials");
     }
+
     const response = await fetch(`/api/user?email=${data.email}`, {
       method: "POST",
       body: JSON.stringify(data),
