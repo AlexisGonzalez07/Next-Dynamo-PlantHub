@@ -31,17 +31,17 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { data: session, status } = useSession(); // Access session information
-  console.log(data)
-  console.log(loading)
-  console.log(error)
-  console.log(session)
-  console.log(status)
+  console.log(data);
+  console.log(loading);
+  console.log(error);
+  console.log(session);
+  console.log(status);
   useEffect(() => {
-    if(status !== "authenticated" ){
-      return
+    if (status !== "authenticated") {
+      return;
     }
     const fetchData = async () => {
-      console.log("THE FETCH DATA HOOK RUNNING BC SESSION AUTHORIZED")
+      console.log("THE FETCH DATA HOOK RUNNING BC SESSION AUTHORIZED");
       setLoading(true);
       setError(null);
       try {
@@ -65,17 +65,19 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   }, [session]);
 
   useEffect(() => {
-    if(status === "authenticated" || data!==null){
-      return
+    if (status === "authenticated" || data !== null) {
+      return;
     }
     const tryLastLoggedIn = async () => {
-      console.log("THE TRY LAST LOGGIN RAN BC LOADING ALLTHOUGH LOADING IS CURRENTLY TRUE, SESSION IS NULL, OR DATA IS NULL")
+      console.log(
+        "THE TRY LAST LOGGIN RAN BC LOADING ALLTHOUGH LOADING IS CURRENTLY TRUE, SESSION IS NULL, OR DATA IS NULL"
+      );
       //This should be await read last logged in token for still available?
       const userInfo = await readLastLogged();
       if (!userInfo) {
         setError("Offline or Unauthenticated");
-        setLoading(false)
-        return
+        setLoading(false);
+        return;
       }
       //if there's a user, we can get these user credentials and their expiration date.
       function isTokenValid(dateString) {
@@ -88,8 +90,8 @@ const IDBProvider = ({ children }: ProvidersProps) => {
       const validToken = isTokenValid(targetDate);
       if (!validToken) {
         setError("Offline or Unauthenticated");
-        setLoading(false)
-        return
+        setLoading(false);
+        return;
       }
       const userInPrimary = await readUser(userInfo.email);
       return updateUserData(userInPrimary);
@@ -98,7 +100,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   }, [loading, session]);
 
   const updateUserData = async (user) => {
-    console.log("THE UPDATE USER DATA RUNNING")
+    console.log("THE UPDATE USER DATA RUNNING");
     try {
       setLoading(true);
       setError(null);
@@ -126,10 +128,41 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   );
 };
 
+type Theme = "light" | "dark" ;
+
+type ThemeContextType = {
+  theme: Theme;
+  toggleTheme: () => void;
+};
+export const ThemeContext = createContext<ThemeContextType | undefined>(
+  undefined
+);
+
+export function ThemeProvider({ children }: ProvidersProps) {
+  const [theme, setTheme] = useState<Theme>("light");
+
+  useEffect(() => {
+    const html = document.querySelector("html");
+    html.setAttribute("data-theme", theme)
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
 export default function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
-      <IDBProvider>{children}</IDBProvider>
+      <IDBProvider>
+        <ThemeProvider>{children}</ThemeProvider>
+      </IDBProvider>
     </SessionProvider>
   );
 }
