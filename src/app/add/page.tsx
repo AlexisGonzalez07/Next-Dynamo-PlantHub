@@ -2,7 +2,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import Image from "next/image";
+import AppPreview from "../../components/AppPreview";
 import axios from "axios";
 import { UserContext } from "../providers";
 import { nanoid } from "nanoid";
@@ -17,7 +17,7 @@ interface Plant {
   waterAdded?: number;
   birthday: string | Date;
   image?: string;
-  id?: string;
+  id?: string; 
   new: boolean;
 }
 
@@ -68,13 +68,8 @@ export default function AddPlant() {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
     };
-
-    // Add event listener for window resize
     window.addEventListener('resize', handleResize);
-
-    // Get initial screen width
     setScreenWidth(window.innerWidth);
-
     // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -226,8 +221,8 @@ export default function AddPlant() {
     return <Loading />;
   }
 
-  if (error === "Offline or Unauthenticated") {
-    return <h1>Unauthenticated Screen Add, Sign Up Online</h1>;
+  if (!data && error === "Offline or Unauthenticated") {
+    return <AppPreview/>;
   } else if (error) {
     return <h1>Undiagnozed home error</h1>;
   }

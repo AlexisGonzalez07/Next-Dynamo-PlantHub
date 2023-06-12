@@ -3,11 +3,12 @@ import { useContext } from "react";
 import { UserContext } from "./providers";
 import PlantCard from "../components/PlantCard";
 import Loading from "../components/Loading";
+import AppPreview from "../components/AppPreview";
 export default function Home() {
   const { data, loading, error } = useContext(UserContext);
   console.log(data)
-  if (error === "Offline or Unauthenticated") {
-    return <h1>Unauthenticated Screen Home, Sign Up Online</h1>;
+  if (!data && error === "Offline or Unauthenticated") {
+    return <AppPreview/>;
   } else if (error) {
     return <h1>Undiagnozed home error</h1>;
   }
@@ -32,7 +33,7 @@ export default function Home() {
         <div className="stat lg:w-2/5 place-items-center">
           <div className="stat-title text-primary">User</div>
           <div className="stat-value text-primary">{data.username}</div>
-          <div className="stat-desc text-primary">{formattedDate}</div>
+          <div className="stat-desc text-primary">Since {formattedDate}</div>
         </div>
 
         <div className="stat lg:w-2/5 place-items-center">
