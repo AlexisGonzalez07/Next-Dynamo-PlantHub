@@ -1,13 +1,9 @@
 import React from 'react'
-import Head from 'next/head'
 type Props = {}
 
-const page = (props: Props) => {
+const PrivacyPolicy = (props: Props) => {
   return (
     <div className="container mx-auto p-4">
-      <Head>
-        <title>Privacy Policy - Next Dynamo Planthub</title>
-      </Head>
       <div className="prose">
         <h1>Privacy Policy</h1>
 
@@ -98,4 +94,4 @@ const page = (props: Props) => {
   )
 }
 
-export default page
+export default PrivacyPolicy
