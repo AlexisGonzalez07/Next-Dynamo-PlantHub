@@ -12,8 +12,8 @@ const FooterNav: React.FC = () => {
   const tab = usePathname();
   console.log(tab)
   const { theme } = useContext(ThemeContext);
-  console.log(theme);
-  const svgFill = theme === "light" ? "#ebdbae" : "#647f4d";
+  console.log(theme)
+  const svgFill = theme === "light" ? "#647f4d" : "#ebdbae";
   const svgStyle = {
     fill: `var(--svg-fill-color-${theme})`, // Use CSS variable based on the theme
   };

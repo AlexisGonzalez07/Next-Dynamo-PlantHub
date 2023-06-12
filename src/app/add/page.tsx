@@ -308,15 +308,18 @@ export default function AddPlant() {
       )}
 
       {step === 2 && (
-        <div className="mt-4 bg-accent border border-secondary w-full max-w-lg mx-auto overflow-y-auto">
+        <div className="mt-4 bg-accent w-full max-w-lg mx-auto overflow-y-auto rounded-xl">
           {previewImage ? (
-            <div className="card w-96 bg-secondary shadow-xl image-full">
+            <div className="card margin-x-auto bg-secondary shadow-xl image-full">
             <figure><img src={previewImage} alt={plantRecommendations?.plant_name} /></figure>
             <div className="card-body">
-              <h2 className="card-title">Shoes!</h2>
-              <p><strong>Plant Type: </strong>
+              <h2 className="card-title text-base-100">Your Plant Image Profile</h2>
+              <p className="text-base-100"><strong>Plant Species: </strong>
                 {plantRecommendations?.plant_name}</p>
-                <p>
+                <p className="text-base-100"><strong>Match Probability: </strong>
+                {plantRecommendations?.probability}%</p>
+                
+                <p className="text-base-100">
                       <strong>Watering Guidelines: </strong>
                       {!plantRecommendations?.minWater
                         ? "Please visit the Wiki for guidance on water care"
@@ -326,12 +329,14 @@ export default function AddPlant() {
                         ? "Your plant requires a moderate to high amount of water"
                         : "Your plant needs a lot of water and care, choose carefully!"}
                     </p>
+                    <p className="text-base-100"><strong>Description: </strong>
+                {plantRecommendations?.description.length > 30? plantRecommendations?.description.substring(0,70) + "..." : plantRecommendations?.description}</p>
               <div className="card-actions justify-end">
               <a
                       href={plantRecommendations?.link}
                       target="_blank"
                       rel="noreferrer"
-                    ><button className="btn btn-primary btn-outline">Visit The Wiki</button></a>
+                    ><button className="btn btn-accent ">Visit The Wiki</button></a>
               </div>
             </div>
           </div>

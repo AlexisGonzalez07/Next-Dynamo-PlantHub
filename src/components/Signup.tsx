@@ -92,7 +92,7 @@ const SignUpForm: React.FC = () => {
             <div className="form-control w-full max-w-lg flex flex-col items-center" key={field.name}>
              <label
                 htmlFor={field.name}
-                className="label w-full max-w-xs"
+                className="label w-full max-w-xs text-white"
               >
                 {field.label}
               </label>

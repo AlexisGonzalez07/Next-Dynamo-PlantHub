@@ -27,17 +27,17 @@ export default function Home() {
   const dateToFormat = new Date();
   const formattedDate = dateToFormat.toLocaleDateString("en-US", options);
   return (
-    <div className="flex flex-col h-full w-full justify-around items-center pt-4">
+    <div className="flex flex-col h-full w-full justify-around items-center py-2">
       <div className="stats shadow bg-secondary flex justify-center w-full ">
         <div className="stat lg:w-2/5 place-items-center">
           <div className="stat-title text-primary">User</div>
           <div className="stat-value text-primary">{data.username}</div>
-          <div className="stat-desc text-primary">Since Jan 1, 2023</div>
+          <div className="stat-desc text-primary">{formattedDate}</div>
         </div>
 
         <div className="stat lg:w-2/5 place-items-center">
           <div className="stat-title text-primary">Garden Size</div>
-          <div className="stat-value text-primary">4,200</div>
+          <div className="stat-value text-primary">{data.plants.length}</div>
           <div className="stat-desc text-primary">Manage your Garden</div>
         </div>
       </div>

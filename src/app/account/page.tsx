@@ -5,10 +5,10 @@ import { UserContext, ThemeContext } from "../providers";
 import Loading from "../../components/Loading";
 import Credentials from "../../components/Credentials";
 export default function Home() {
-  const {data, loading, error } = useContext(UserContext);
+  const { data, loading, error } = useContext(UserContext);
   const [checkedTab, setCheckedTab] = useState<String>("");
-  const {theme,toggleTheme} = useContext(ThemeContext)
-  const {status} = useSession()
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { status } = useSession();
   if (error === "Offline or Unauthenticated") {
     return <Credentials />;
   } else if (error) {
@@ -21,9 +21,8 @@ export default function Home() {
       </>
     );
   }
-  if (status !=="authenticated") {
+  if (status !== "authenticated") {
     return <Credentials />;
-
   }
   const handleCheckBoxChange = (section: string) => {
     if (checkedTab === section) {
@@ -34,7 +33,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full items-center justify-around text-secondary max-w-lg mx-1 p-1">
+    <div className="flex flex-col h-full w-full items-center justify-around text-secondary max-w-lg p-1">
       <div className="collapse collapse-arrow bg-secondary text-primary mx-2">
         <input
           type="radio"
@@ -62,19 +61,30 @@ export default function Home() {
           Application Settings
         </div>
         <div className="collapse-content text-primary">
-        <div className="form-control">
-  <label className="label cursor-pointer">
-    <span className="label-text text-primary">Light Mode</span> 
-    <input type="radio" name="radio-10" className="radio checked:bg-primary" onChange={() => toggleTheme("light")} checked={theme === "light"? true: false}/>
-  </label>
-</div>
-<div className="form-control">
-  <label className="label cursor-pointer">
-    <span className="label-text text-primary">Dark Mode</span> 
-    <input type="radio" name="radio-10" className="radio checked:bg-primary" onChange={() => toggleTheme("dark")}
-    checked={theme === "dark"? true: false}/>
-  </label>
-</div>
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text text-primary">Light Mode</span>
+              <input
+                type="radio"
+                name="radio-10"
+                className="radio checked:bg-primary"
+                onChange={() => toggleTheme("light")}
+                checked={theme === "light" ? true : false}
+              />
+            </label>
+          </div>
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text text-primary">Dark Mode</span>
+              <input
+                type="radio"
+                name="radio-10"
+                className="radio checked:bg-primary"
+                onChange={() => toggleTheme("dark")}
+                checked={theme === "dark" ? true : false}
+              />
+            </label>
+          </div>
         </div>
       </div>
       <div className="collapse collapse-arrow bg-secondary text-primary">

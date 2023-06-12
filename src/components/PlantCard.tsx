@@ -76,10 +76,9 @@ const PlantCard: React.FC<PlantCardProps> = ({ card }) => {
       </figure>
       <div className="card-body text-primary px-1">
         <h2 className="card-title">
-          {card.nickname || card.name}
+         {card.nickname || card.name}
         </h2>
         <p>Birthday: {formattedDate}</p>
-        <p>Type: {card.plantType}</p>
         <p>Type: {card.plantType}</p>
         <p>Size: {card.plantSize}</p>
         <p>Status: {status}</p>
