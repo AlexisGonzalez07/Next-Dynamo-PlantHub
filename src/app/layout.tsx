@@ -22,13 +22,12 @@ export default function RootLayout({
         <link rel="manifest" href="./manifest.json" />
       </head>
       <Providers>
-        <body className={`min-w-screen ${inter.className} flex justify-center`}>
-          <div className="min-h-screen w-full 2xl:w-4/5 flex flex-col items-center">
-            <main className="flex-1 bg-red-500 w-full flex flex-col items-center justify-around">
+        <body className={`min-w-screen ${inter.className} flex bg-primary justify-center`}>
+          
+            <main className="w-full flex flex-col items-center justify-around 2xl:w-4/5 h-screen text-secondary mb-16">
               {children}
             </main>
             <FooterNav />
-          </div>
         </body>
       </Providers>
     </html>

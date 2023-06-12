@@ -7,6 +7,7 @@ import axios from "axios";
 import { UserContext } from "../providers";
 import { nanoid } from "nanoid";
 import { useRouter } from 'next/navigation'
+import Loading from "../../components/Loading";
 interface Plant {
   name: string;
   nickname?: string;
@@ -200,7 +201,7 @@ export default function AddPlant() {
   };
 
   if(loading){
-    return <h1>Loading...</h1>
+    return <Loading/>
   }
 
     if(error === "Offline or Unauthenticated"){

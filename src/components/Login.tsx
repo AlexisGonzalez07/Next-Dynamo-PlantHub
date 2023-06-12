@@ -52,39 +52,39 @@ const LoginForm: React.FC = () => {
   };
 
   return (
+    <div>
     <Formik
       initialValues={initialState}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
+      className="flex flex-col items-center"
     >
       {({ isValid, isSubmitting }) => (
-        <Form className="max-w-md mx-auto text-black">
+        <Form className="w-full text-primary max-w-lg">
           {formFields.map((field) => (
-            <div className="mb-4" key={field.name}>
-              <label
-                htmlFor={field.name}
-                className="block text-sm font-medium text-gray-700"
-              >
+            <div
+              className="form-control w-full max-w-lg flex flex-col items-center pb-4"
+              key={field.name}
+            >
+              <label htmlFor={field.name} className="label w-full max-w-xs">
                 {field.label}
               </label>
               <Field
                 type={field.type}
                 id={field.name}
                 name={field.name}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="input input-bordered w-full max-w-xs"
               />
               <ErrorMessage
                 name={field.name}
                 component="div"
-                className="text-red-500 text-sm mt-1"
+                className="text-error max-w-xs"
               />
             </div>
           ))}
-          <h4 className="text-white">{errorMessage}</h4>
-
           <button
             type="submit"
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="btn w-full max-w-xs mx-auto"
             disabled={!isValid || isSubmitting}
           >
             Submit
@@ -92,6 +92,7 @@ const LoginForm: React.FC = () => {
         </Form>
       )}
     </Formik>
+    </div>
   );
 };
 
