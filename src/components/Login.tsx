@@ -60,7 +60,7 @@ const LoginForm: React.FC = () => {
       className="flex flex-col items-center"
     >
       {({ isValid, isSubmitting }) => (
-        <Form className="w-full text-primary max-w-lg">
+        <Form className="w-full text-secondary max-w-lg">
           {formFields.map((field) => (
             <div
               className="form-control w-full max-w-lg flex flex-col items-center pb-4"
@@ -84,8 +84,7 @@ const LoginForm: React.FC = () => {
           ))}
           <button
             type="submit"
-            className="btn w-full max-w-xs mx-auto"
-            disabled={!isValid || isSubmitting}
+            className="btn btn-secondary w-full max-w-xs mx-auto text-accent"  disabled={!isValid || isSubmitting}
           >
             Submit
           </button>

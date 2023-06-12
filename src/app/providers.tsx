@@ -8,6 +8,7 @@ import {
   readLastLogged,
   writeLastLogged,
 } from "../utils/idb";
+import { usePathname } from "next/navigation";
 interface ProvidersProps {
   children: ReactNode;
 }
@@ -132,7 +133,7 @@ type Theme = "light" | "dark" ;
 
 type ThemeContextType = {
   theme: Theme;
-  toggleTheme: () => void;
+  toggleTheme: (value:Theme) => void;
 };
 export const ThemeContext = createContext<ThemeContextType | undefined>(
   undefined
@@ -142,12 +143,19 @@ export function ThemeProvider({ children }: ProvidersProps) {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
+    console.log("USE EFFECT RUNNING")
+    console.log(theme)
     const html = document.querySelector("html");
-    html.setAttribute("data-theme", theme)
+    html.removeAttribute("data-theme")
+    html.setAttribute("data-theme", localStorage.getItem("theme"))
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  const toggleTheme = (newTheme: Theme) => {
+    if(theme === newTheme){
+      return
+    }
+    localStorage.setItem("theme", newTheme)
+    setTheme(newTheme)
   };
 
   return (
