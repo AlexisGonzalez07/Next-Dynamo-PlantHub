@@ -68,7 +68,7 @@ module.exports = {
           info: "#7dd3fc",
           success: "#e9d5ff",
           warning: "#fde047",
-          error: "#f87171"
+          error: "#b91c1c"
         },
         extend: {
           // Extend the hover effects for light theme

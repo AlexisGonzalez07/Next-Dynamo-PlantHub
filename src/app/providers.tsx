@@ -147,7 +147,6 @@ export function ThemeProvider({ children }: ProvidersProps) {
     console.log(theme)
     const html = document.querySelector("html");
     html.removeAttribute("data-theme")
-
     html.setAttribute("data-theme", localStorage.getItem("theme"))
   }, [theme]);
 
@@ -156,7 +155,6 @@ export function ThemeProvider({ children }: ProvidersProps) {
       return
     }
     localStorage.setItem("theme", newTheme)
-
     setTheme(newTheme)
   };
 

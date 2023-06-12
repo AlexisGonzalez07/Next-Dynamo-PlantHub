@@ -6,7 +6,7 @@ import Image from "next/image";
 import axios from "axios";
 import { UserContext } from "../providers";
 import { nanoid } from "nanoid";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 import Loading from "../../components/Loading";
 interface Plant {
   name: string;
@@ -18,7 +18,7 @@ interface Plant {
   birthday: string | Date;
   image?: string;
   id?: string;
-  new: boolean
+  new: boolean;
 }
 
 interface FormField {
@@ -41,28 +41,45 @@ const validationSchema = Yup.object({
 });
 
 const formFields: FormField[] = [
-  { label: "Name", name: "name", type: "text" },
-  { label: "Nickname", name: "nickname", type: "text" },
+  { label: "Name* :", name: "name", type: "text" },
+  { label: "Nickname :", name: "nickname", type: "text" },
   {
-    label: "Plant Type",
+    label: "Plant Type* :",
     name: "plantType",
     type: "select",
     options: ["Indoor", "Outdoor"],
   },
   {
-    label: "Plant Size",
+    label: "Plant Size* :",
     name: "plantSize",
     type: "select",
     options: ["S", "M", "L"],
   },
-  { label: "Water Needed", name: "waterNeeded", type: "number" },
-  { label: "Birthday", name: "birthday", type: "date" },
+  { label: "Water Needed* :", name: "waterNeeded", type: "number" },
+  { label: "Birthday* :", name: "birthday", type: "date" },
 ];
 
 export default function AddPlant() {
   const { data, loading, error, updateUserData } = useContext(UserContext);
-    const router = useRouter()  
-    console.log(router)
+  const router = useRouter();
+  const [screenWidth, setScreenWidth] = useState(0);
+  console.log(screenWidth)
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Get initial screen width
+    setScreenWidth(window.innerWidth);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   const [step, setStep] = useState(1);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [plantRecommendations, setPlantRecommendations] = useState(null);
@@ -178,56 +195,62 @@ export default function AddPlant() {
     console.log("Submitted", values);
     const date = new Date(values.birthday);
     const timestamp = date.getTime() / 1000; // Divide by 1000 to convert milliseconds to seconds
-    const finalPlant = {...values, birthday: timestamp, id: nanoid()}
+    const finalPlant = { ...values, birthday: timestamp, id: nanoid() };
     // calculate waterAdded based on the current date
     const currentDate = new Date();
     const currentDayOfMonth = currentDate.getDate();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
-    const numberOfDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    finalPlant.waterAdded = Math.floor(finalPlant.waterNeeded * (currentDayOfMonth / numberOfDaysInMonth));
-    if(plantRecommendations){
-     finalPlant.image = plantRecommendations.image
+    const numberOfDaysInMonth = new Date(
+      currentYear,
+      currentMonth + 1,
+      0
+    ).getDate();
+    finalPlant.waterAdded = Math.floor(
+      finalPlant.waterNeeded * (currentDayOfMonth / numberOfDaysInMonth)
+    );
+    if (plantRecommendations) {
+      finalPlant.image = plantRecommendations.image;
     }
-    if(data){
-     data.plants.push(finalPlant)
-     updateUserData(data)
-      router.replace("/")
-    //  setSubmitting(false)
+    if (data) {
+      data.plants.push(finalPlant);
+      updateUserData(data);
+      router.replace("/");
+      //  setSubmitting(false)
     } else {
-     alert("ONLY LOGGED IN USERS CAN ADD A PLANT")
-     setSubmitting(false)
+      alert("ONLY LOGGED IN USERS CAN ADD A PLANT");
+      setSubmitting(false);
     }
   };
-
-  if(loading){
-    return <Loading/>
+  if (loading) {
+    return <Loading />;
   }
 
-    if(error === "Offline or Unauthenticated"){
-    return <h1>Unauthenticated Screen Add, Sign Up Online</h1>
-  } else if (error){
-    return <h1>Undiagnozed home error</h1>
+  if (error === "Offline or Unauthenticated") {
+    return <h1>Unauthenticated Screen Add, Sign Up Online</h1>;
+  } else if (error) {
+    return <h1>Undiagnozed home error</h1>;
   }
   return (
-    <div className="bg-red-500 w-full lg:w-4/5 p-2  max-w-[1000px]">
+    <div className="w-full p-2 max-w-[1000px] ">
       {step === 1 && (
-        <div className="max-w-md mx-auto text-black">
-          <header className="bg-blue-500 py-4">
-            <div className="max-w-7xl mx-auto px-4">
-              <h1 className="text-white text-3xl font-bold">
-                New Premium Feature!
-              </h1>
-              <p className="text-white text-lg mt-2">
+        <div className="max-w-xl mx-auto ">
+          <header className="py-4 bg-accent border border-white">
+            <div className="mx-auto px-4 text-white">
+              <h1 className="text-3xl font-bold">New Premium Feature!</h1>
+              <p className="text-lg mt-2">
                 Upload A Picture of Your Plant and Get AI Suggested Plant
                 Details
               </p>
             </div>
           </header>
-          <div className="w-full">
-            <div className="relative bg-gray-200 border border-gray-400 rounded cursor-move flex items-center justify-center p-20">
+            <div className="form-control w-full h-full flex justify-center text-white bg-accent border border-white rounded cursor-pointer">
+              <label className="label">
+                <span className="label-text  text-white">Upload an Image</span>
+              </label>
+              <div className="flex items-center justify-center">
               <input
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                className="file-input file-input-bordered md:p-20 h-auto"
                 type="file"
                 id="image"
                 accept="image/*"
@@ -235,21 +258,17 @@ export default function AddPlant() {
                   handleUpload(e.target.files && e.target.files[0])
                 }
               />
-              <label
-                htmlFor="image"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Drag or Click to Upload An Image
+              </div>
+              <label className="label">
+                <span className="label-text-alt  text-white">Supported Formats: JPEG, JPG, PNG</span>
               </label>
-            </div>
           </div>
-
           {previewImage && (
             <div className="fixed inset-0 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md">
-                <h2 className="text-lg font-bold mb-4">Confirm Plant Image</h2>
+              <div className="bg-secondary rounded-lg p-6 max-w-md">
+                <h2 className="text-lg font-bold mb-4 text-primary">Confirm Plant Image</h2>
                 <div className="mt-2">
-                  <Image
+                  <img
                     src={previewImage}
                     alt="Preview"
                     className="max-w-full h-auto"
@@ -257,16 +276,16 @@ export default function AddPlant() {
                     height={500}
                   />
                 </div>
-                <p className="text-gray-600 mb-6">Is this your new plant?</p>
-                <div className="flex justify-end">
+                <p className="text-primary mb-6">Your plant will have this image</p>
+                <div className="flex justify-around">
                   <button
-                    className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2"
+                    className="btn btn-error"
                     onClick={handleCancel}
                   >
                     Cancel
                   </button>
                   <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    className="btn btn-primary"
                     onClick={handleProceed}
                   >
                     Proceed
@@ -276,10 +295,10 @@ export default function AddPlant() {
             </div>
           )}
 
-          <div className="flex justify-end">
-            <p className="text-gray-600 mb-6">Looking for regular UI?</p>
+          <div className="flex justify-end items-center bg-accent border border-white text-white flex-col md:flex-row">
+            <h3>Looking for regular UI?</h3>
             <button
-              className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2"
+              className="btn btn-primary btn-outline m-2"
               onClick={handleProceed}
             >
               Continue without Uploading an Image
@@ -289,56 +308,15 @@ export default function AddPlant() {
       )}
 
       {step === 2 && (
-        <div className="w-full p-5 lg:w=3/5 text-black">
+        <div className="mt-4 bg-accent border border-secondary w-full max-w-lg mx-auto overflow-y-auto">
           {previewImage ? (
-            <div className="flex justify-around gap-2 mb-4">
-              <div className="w=1/3 flex">
-                <Image
-                  src={previewImage}
-                  alt="Preview"
-                  className="max-w-full h-auto rounded-lg"
-                  width={500}
-                  height={500}
-                />
-              </div>
-              <div className="w=3/5">
-                <div className="text-left">
-                  <div className="mb-2">
-                    <h2 className="text-xl font-semibold">
-                      {plantRecommendations?.plant_name}
-                    </h2>
-                  </div>
-                  <div className="mb-2">
-                    <p>
-                      <strong>Plant Type: </strong>
-                      {plantRecommendations?.plant_name}
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <p>
-                      <strong>Plant Match Probability: </strong>
-                      {plantRecommendations?.probability}%
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <p>
-                      <strong>Plant Description: </strong>
-                      {plantRecommendations?.description}
-                    </p>
-                  </div>
-                  <div className="mb-2">
-                    <a
-                      href={plantRecommendations?.link}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <p className="text-blue-600">
-                        Visit the Wiki for care tips!
-                      </p>
-                    </a>
-                  </div>
-                  <div className="mb-2">
-                    <p>
+            <div className="card w-96 bg-secondary shadow-xl image-full">
+            <figure><img src={previewImage} alt={plantRecommendations?.plant_name} /></figure>
+            <div className="card-body">
+              <h2 className="card-title">Shoes!</h2>
+              <p><strong>Plant Type: </strong>
+                {plantRecommendations?.plant_name}</p>
+                <p>
                       <strong>Watering Guidelines: </strong>
                       {!plantRecommendations?.minWater
                         ? "Please visit the Wiki for guidance on water care"
@@ -348,27 +326,39 @@ export default function AddPlant() {
                         ? "Your plant requires a moderate to high amount of water"
                         : "Your plant needs a lot of water and care, choose carefully!"}
                     </p>
-                  </div>
-                </div>
+              <div className="card-actions justify-end">
+              <a
+                      href={plantRecommendations?.link}
+                      target="_blank"
+                      rel="noreferrer"
+                    ><button className="btn btn-primary btn-outline">Visit The Wiki</button></a>
               </div>
             </div>
+          </div>
+
           ) : (
-            <></>
+            <div className="mx-auto px-4 text-white">
+              <h1 className="text-3xl font-bold">Add A New Plant</h1>
+              <p className="text-sm mt-2">
+                Fields with * are required
+              </p>
+            </div>
           )}
 
           <Formik
             initialValues={plantState}
             validationSchema={validationSchema}
             onSubmit={handlePlantSubmit}
+            className="flex flex-col items-center justify-center overflow-y-auto"
           >
             {({ isValid, isSubmitting }) => (
               <>
-                <Form>
+                <Form className="w-full max-w-lg mx-auto bg-accent border border-secondary rounded py-2 text-white">
                   {formFields.map((field) => (
-                    <div className="mb-4" key={field.name}>
+                    <div className="form-control w-full max-w-lg flex flex-col items-center pb-4" key={field.name}>
                       <label
                         htmlFor={field.name}
-                        className="block text-sm font-medium text-gray-700"
+                        className="label w-full max-w-xs"
                       >
                         {field.label}
                       </label>
@@ -377,7 +367,7 @@ export default function AddPlant() {
                           as="select"
                           id={field.name}
                           name={field.name}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          className="input input-bordered w-full max-w-xs"
                         >
                           {field.options?.map((option) => (
                             <option key={option} value={option}>
@@ -390,27 +380,27 @@ export default function AddPlant() {
                           type={field.type}
                           id={field.name}
                           name={field.name}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          className="input input-bordered w-full max-w-xs"
                         />
                       )}
                       <ErrorMessage
                         name={field.name}
                         component="div"
-                        className="text-red-500 text-sm mt-1"
-                      />
+                        className="text-error max-w-xs"
+                        />
                     </div>
                   ))}
+                    <div className="flex flex-col mt-2 gap-2">
                   <button
                     type="submit"
-                    className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="btn btn-primary btn-outline w-full max-w-xs mx-auto text-white"
                     disabled={!isValid || isSubmitting}
                   >
                     Submit
                   </button>
-                  <div className="flex my-2">
                     <button
-                      className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2"
-                      onClick={handleGoBack}
+                    className="btn btn-primary btn-outline w-full max-w-xs mx-auto text-white"
+                    onClick={handleGoBack}
                     >
                       Go Back
                     </button>

@@ -27,8 +27,8 @@ export default function Home() {
   const dateToFormat = new Date();
   const formattedDate = dateToFormat.toLocaleDateString("en-US", options);
   return (
-    <div className="flex flex-col h-full w-full justify-around pt-4">
-      <div className="stats shadow bg-secondary flex justify-center">
+    <div className="flex flex-col h-full w-full justify-around items-center pt-4">
+      <div className="stats shadow bg-secondary flex justify-center w-full ">
         <div className="stat lg:w-2/5 place-items-center">
           <div className="stat-title text-primary">User</div>
           <div className="stat-value text-primary">{data.username}</div>
@@ -41,9 +41,11 @@ export default function Home() {
           <div className="stat-desc text-primary">Manage your Garden</div>
         </div>
       </div>
-      <div className="flex-1 bg-yellow-500 flex flex-col items-center justify-around ">
-        <div className="px-4 bg-white w-full md:w-9/10 lg:w-4/5 ">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-black">
+      <div className="flex-1 flex flex-col items-center justify-around mt-2">
+        <div className="md:px-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 
+          lg:grid-cols-1
+          gap-2">
             {data.plants.map((card, index) => (
               <PlantCard key={index} card={card} />
             ))}
