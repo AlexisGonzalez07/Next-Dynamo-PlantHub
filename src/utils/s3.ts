@@ -18,6 +18,7 @@ const uploadImageToS3 = (params): Promise<string | Error> => {
         reject(err);
       } else {
         console.log("Image uploaded successfully:", data.Location);
+        //Just return the location of the image in the bucket
         resolve(data.Location as string);
       }
     });

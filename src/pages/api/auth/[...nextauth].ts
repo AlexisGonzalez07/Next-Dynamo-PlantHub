@@ -137,6 +137,7 @@ const options: NextAuthOptions = {
           //fallback if implementation doesn't work
           return protocol.google(value.user);
         default:
+          //currently this returns true if the provider is credentials
           return true;
       }
     },
