@@ -77,7 +77,7 @@ const PrivacyPolicy = (props: Props) => {
     <p>
       If you have any questions, concerns, or requests regarding this
       Privacy Policy or the handling of your personal information, please
-      contact us at [contact email or address].
+      contact us at alexis.gonzalez07@gmail.com.
     </p>
 
     <p>
