@@ -119,9 +119,10 @@ export default function Home() {
           checked={checkedTab == "Membership" ? true : false}
           onChange={() => handleCheckBoxChange("Membership")}
         />{" "}
-        <div className="collapse-title text-xl font-medium">Membership</div>
+        <div className="collapse-title text-xl font-medium">Membership and Privacy</div>
         <div className="collapse-content text-primary">
           <p>Details To Come</p>
+          <a href="/privacy" target="_blank" rel="nonreferrer">Privacy Policy</a>
         </div>
       </div>
     </div>
