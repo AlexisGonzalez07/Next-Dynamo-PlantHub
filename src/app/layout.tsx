@@ -24,7 +24,7 @@ export default function RootLayout({
       </head>
       <Providers>
         <body className={`min-w-screen ${inter.className} flex bg-primary justify-center h-auto flex-col items-center min-h-screen`}>
-            <main className="w-full flex-1 flex flex-col items-center justify-around 2xl:w-4/5 text-secondary mb-16 overflow-y-auto">
+            <main className="w-full flex-1 flex flex-col items-center justify-around 2xl:w-4/5 text-secondary mb-16 overflow-y-auto ">
               {children}
             </main>
             <FooterNav />
