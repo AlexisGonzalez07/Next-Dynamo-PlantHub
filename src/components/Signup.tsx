@@ -88,11 +88,11 @@ const SignUpForm: React.FC = () => {
       onSubmit={handleSubmit}
     >
       {({ isValid, isSubmitting }) => (
-        <Form className="w-full text-primary max-w-lg h-auto bg-blue">          {formFields.map((field) => (
+        <Form className="w-full text-secondary max-w-lg h-auto ">          {formFields.map((field) => (
             <div className="form-control w-full max-w-lg flex flex-col items-center" key={field.name}>
              <label
                 htmlFor={field.name}
-                className="label w-full max-w-xs text-white"
+                className="label w-full max-w-xs text-secondary"
               >
                 {field.label}
               </label>
@@ -100,7 +100,7 @@ const SignUpForm: React.FC = () => {
                 type={field.type}
                 id={field.name}
                 name={field.name}
-                className="input input-bordered w-full max-w-xs"
+                className="input input-bordered w-full max-w-xs text-secondary"
               />
               <ErrorMessage
                 name={field.name}
@@ -112,7 +112,7 @@ const SignUpForm: React.FC = () => {
           <h4 className="text-white">{errorMessage}</h4>
           <button
             type="submit"
-            className="btn w-full max-w-xs my-2 mx-auto"
+            className="btn btn-secondary w-full max-w-xs my-2 mx-auto"
             disabled={!isValid || isSubmitting}
           >
             Submit

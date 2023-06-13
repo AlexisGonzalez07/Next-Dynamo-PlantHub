@@ -97,10 +97,10 @@ export default function AddPlant() {
     let neededWater = Math.floor(plantRecommendations?.minWater * 10);
     setPlantState((prevState) => ({
       ...prevState,
-      name: plantRecommendations.plant_name,
+      name: plantRecommendations?.plant_name,
       waterNeeded: neededWater || 15,
       image:
-        plantRecommendations.image || plantRecommendations.wiki_image || "",
+        plantRecommendations?.image || plantRecommendations?.wiki_image || "",
     }));
   }, [plantRecommendations]);
 
@@ -132,15 +132,16 @@ export default function AddPlant() {
         return;
       }
       if (data?.suggestions?.length) {
+        let currentDescription = data.suggestions[0].plant_details?.wiki_description?.value.split(
+          "."
+        )[0]
+        var formattedDescription = currentDescription.length > 30? currentDescription.substring(0,70) + "..." : currentDescription
         setPlantRecommendations({
           plant_name: data.suggestions[0].plant_details?.scientific_name,
-          minWater: data.suggestions[0].plant_details.watering?.max,
-          maxWater: data.suggestions[0].plant_details.watering?.min,
+          minWater: data.suggestions[0].plant_details?.watering?.max,
+          maxWater: data.suggestions[0].plant_details?.watering?.min,
           probability: (data.suggestions[0].probability * 100).toFixed(2),
-          description:
-            data.suggestions[0].plant_details.wiki_description?.value.split(
-              "."
-            )[0],
+          description: formattedDescription,
           link: data.suggestions[0].plant_details?.url,
           image: data?.images[0]?.url,
           wiki_image: data.suggestions[0].plant_details.wiki_image?.value,
@@ -325,7 +326,7 @@ export default function AddPlant() {
                         : "Your plant needs a lot of water and care, choose carefully!"}
                     </p>
                     <p className="text-base-100"><strong>Description: </strong>
-                {plantRecommendations?.description.length > 30? plantRecommendations?.description.substring(0,70) + "..." : plantRecommendations?.description}</p>
+                {plantRecommendations?.description}</p>
               <div className="card-actions justify-end">
               <a
                       href={plantRecommendations?.link}

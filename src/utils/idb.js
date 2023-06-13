@@ -34,7 +34,7 @@ const openUserDb = () => {
       request.onsuccess = (event) => {
         const user = event.target.result;
         console.log("THIS IS WHAT WAS READ")
-        console.log(user)
+        console.log(typeof user)
         resolve(user);
       };
   
