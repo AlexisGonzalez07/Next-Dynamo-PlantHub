@@ -32,13 +32,13 @@ export default function Home() {
       <div className="stats shadow bg-secondary flex justify-center w-full ">
         <div className="stat lg:w-2/5 place-items-center">
           <div className="stat-title text-primary">User</div>
-          <div className="stat-value text-primary">{data.username}</div>
+          <div className="stat-value text-primary">{data?.username}</div>
           <div className="stat-desc text-primary">Since {formattedDate}</div>
         </div>
 
         <div className="stat lg:w-2/5 place-items-center">
           <div className="stat-title text-primary">Garden Size</div>
-          <div className="stat-value text-primary">{data.plants.length}</div>
+          <div className="stat-value text-primary">{data?.plants.length}</div>
           <div className="stat-desc text-primary">Manage your Garden</div>
         </div>
       </div>
@@ -47,7 +47,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-3 
           lg:grid-cols-1
           gap-2">
-            {data.plants.map((card, index) => (
+            {data?.plants.map((card, index) => (
               <PlantCard key={index} card={card} />
             ))}
           </div>

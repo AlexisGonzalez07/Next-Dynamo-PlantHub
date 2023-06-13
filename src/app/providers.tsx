@@ -8,7 +8,6 @@ import {
   readLastLogged,
   writeLastLogged,
 } from "../utils/idb";
-import { usePathname } from "next/navigation";
 interface ProvidersProps {
   children: ReactNode;
 }
@@ -41,21 +40,50 @@ const IDBProvider = ({ children }: ProvidersProps) => {
     if (status !== "authenticated") {
       return;
     }
+    function isGreaterThanDay(timestamp: number): boolean {
+      const currentTime = Date.now();
+      const oneDayMilliseconds = 24 * 60 * 60 * 1000;
+      // Number of milliseconds in a day
+      return timestamp > currentTime + oneDayMilliseconds;
+    }
     const fetchData = async () => {
       console.log("THE FETCH DATA HOOK RUNNING BC SESSION AUTHORIZED");
       setLoading(true);
       setError(null);
       try {
-        const userInfo = await readUser(session?.user?.email);
-        // This means it's the user's first time.
-        if (!userInfo?.firstName) {
+        const userInfo = await readUser(session.user.email);
+        //this means the user just signed up!
+        //This code will run if the userData is not in the database
+        if (!userInfo) {
           const response = await fetch(
             `/api/user?email=${session?.user?.email}`
           );
-          const newUser = await response.json();
+          let newUser = await response.json();
+          //add some error handling for newUser.error or whaterver the console.log of the response is
+          newUser = {
+            ...newUser,
+            lastSynced: Date.now(),
+          };
           return updateUserData(newUser);
         }
-        setData(userInfo);
+        // This will run if the last time it was synced is greater than 24 hours. We will first insure that there are no updates pending, if ther are, we will fetch the DB to update, and simply just return.
+        if (isGreaterThanDay(userInfo.lastSynced)) {
+          //check if there are modifications
+          if (userInfo.isModified) {
+            console.log("we gotta save data to db by fetching updateUser");
+            //we should return updateUserData with current user info, just delete isModified. Additionally, I must return
+               //add some error handling for failed update.error or whaterver the console.log of the response is
+            return updateUserData(userInfo);
+          }
+          const response = await fetch(`/api/user?email=${session.user.email}`);
+          let syncronizedUser = await response.json();
+             //add some error handling for newUser.error or whaterver the console.log of the response is
+          syncronizedUser = {
+            ...syncronizedUser,
+            lastSynced: Date.now(),
+          };
+          return updateUserData(syncronizedUser);
+        }
       } catch (error) {
         setError(error);
       } finally {
@@ -71,7 +99,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
     }
     const tryLastLoggedIn = async () => {
       console.log(
-        "THE TRY LAST LOGGIN RAN BC LOADING ALLTHOUGH LOADING IS CURRENTLY TRUE, SESSION IS NULL, OR DATA IS NULL"
+        "THE TRY LAST LOGGIN RAN BC LOADING ALLTHOUGH LOADING IS CURRENTLY TRUE, SESSION IS NOT ONLINE, OR DATA IS NULL BECAUSE USER SIGNED OUT"
       );
       //This should be await read last logged in token for still available?
       const userInfo = await readLastLogged();
@@ -94,11 +122,16 @@ const IDBProvider = ({ children }: ProvidersProps) => {
         setLoading(false);
         return;
       }
-      const userInPrimary = await readUser(userInfo.email);
-      return updateUserData(userInPrimary);
+      const backupUserValidated = await readUser(userInfo.email);
+      if (!backupUserValidated) {
+        setError("Offline or Unauthenticated");
+        setLoading(false);
+        return;
+      }
+      updateUserData(backupUserValidated);
     };
     tryLastLoggedIn();
-  }, [loading, session]);
+  }, [loading, session, data]);
 
   const updateUserData = async (user) => {
     console.log("THE UPDATE USER DATA RUNNING");
@@ -129,11 +162,11 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   );
 };
 
-type Theme = "light" | "dark" ;
+type Theme = "light" | "dark";
 
 type ThemeContextType = {
   theme: Theme;
-  toggleTheme: (value:Theme) => void;
+  toggleTheme: (value: Theme) => void;
 };
 export const ThemeContext = createContext<ThemeContextType | undefined>(
   undefined
@@ -143,19 +176,19 @@ export function ThemeProvider({ children }: ProvidersProps) {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    console.log("USE EFFECT RUNNING")
-    console.log(theme)
+    console.log("USE EFFECT RUNNING");
+    console.log(theme);
     const html = document.querySelector("html");
-    html.removeAttribute("data-theme")
-    html.setAttribute("data-theme", localStorage.getItem("theme"))
+    html.removeAttribute("data-theme");
+    html.setAttribute("data-theme", localStorage.getItem("theme"));
   }, [theme]);
 
   const toggleTheme = (newTheme: Theme) => {
-    if(theme === newTheme){
-      return
+    if (theme === newTheme) {
+      return;
     }
-    localStorage.setItem("theme", newTheme)
-    setTheme(newTheme)
+    localStorage.setItem("theme", newTheme);
+    setTheme(newTheme);
   };
 
   return (
@@ -167,10 +200,10 @@ export function ThemeProvider({ children }: ProvidersProps) {
 
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <SessionProvider>
-      <IDBProvider>
-        <ThemeProvider>{children}</ThemeProvider>
-      </IDBProvider>
-    </SessionProvider>
+    <ThemeProvider>
+      <SessionProvider>
+        <IDBProvider>{children}</IDBProvider>
+      </SessionProvider>
+    </ThemeProvider>
   );
 }

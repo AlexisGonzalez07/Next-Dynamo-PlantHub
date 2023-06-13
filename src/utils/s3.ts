@@ -10,7 +10,7 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-const uploadImageToS3 = (params): Promise<any | Error> => {
+const uploadImageToS3 = (params): Promise<string | Error> => {
   return new Promise((resolve, reject) => {
     s3.upload(params, (err, data) => {
       if (err) {
@@ -18,14 +18,16 @@ const uploadImageToS3 = (params): Promise<any | Error> => {
         reject(err);
       } else {
         console.log("Image uploaded successfully:", data.Location);
-        resolve(data);
+        resolve(data.Location as string);
       }
     });
   });
 };
 
-export const uploadImage = async (imageLink) => {
-  if (!imageLink) return "";
+export const uploadImage = async (imageLink: string) => {
+  if (!imageLink){
+    throw new Error ("No image link provided to upload image")
+  }
   const response = await axios.get(imageLink, { responseType: "arraybuffer" });
   console.log(response);
   const fileContent = response.data;
@@ -37,9 +39,9 @@ export const uploadImage = async (imageLink) => {
     Body: fileContent,
   };
   try {
-    const uploadResponse = await uploadImageToS3(params);
-    console.log("Upload response:", uploadResponse);
-    return uploadResponse.Location;
+    const imageLocation = await uploadImageToS3(params);
+    console.log("Upload response:", imageLocation);
+    return imageLocation;
     // Handle the upload response or perform any additional actions
   } catch (error) {
     console.log("Upload error:", error);
