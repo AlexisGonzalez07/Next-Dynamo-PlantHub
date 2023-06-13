@@ -19,6 +19,7 @@ export default function RootLayout({
           name="google-site-verification"
           content="5Xzl4EDlS38QJSKo4iDRxcca9-ElZPXPp3lzYiANlo8"
         />
+        <meta name="theme-color" content="#ebdbae"/>
         <link rel="manifest" href="./manifest.json" />
       </head>
       <Providers>
