@@ -75,8 +75,12 @@ export default function Account() {
     });
     console.log(response);
     const responseData = await response.json();
+    if(responseData.message !== "All data uploaded"){
+throw new Error("Error uploading to db")
+    }
     // if successfull, change the data plants and remove key new or image_updated that I add to plants during creation/update
     console.log(responseData);
+    return
     // if not successfull, then store database but add a key so we can retry the attempt when next logged in
     // if we are not online, this will fail. Must check if we are connected to our servers.
     try {
