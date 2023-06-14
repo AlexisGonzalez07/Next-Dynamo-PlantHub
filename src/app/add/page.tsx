@@ -6,19 +6,21 @@ import AppPreview from "../../components/AppPreview";
 import axios from "axios";
 import { UserContext } from "../providers";
 import { nanoid } from "nanoid";
-import { useRouter } from "next/navigation";
 import Loading from "../../components/Loading";
 interface Plant {
   name: string;
-  nickname?: string;
+  nickname: string;
   plantType: "Outdoor" | "Indoor";
   plantSize: "L" | "M" | "S";
   waterNeeded: number;
   waterAdded?: number;
-  birthday: string | Date;
-  image?: string;
-  id?: string; 
-  new: boolean;
+  birthday: string | Date | number;
+  image: string;
+}
+interface SavePlant extends Plant {
+  birthday: number;
+  id: string; 
+  image_update: boolean;
 }
 
 interface FormField {
@@ -30,7 +32,7 @@ interface FormField {
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
-  nickname: Yup.string(),
+  nickname: Yup.string().required("Nickname is required"),
   plantType: Yup.string().required("Plant type is required"),
   plantSize: Yup.string().required("Plant size is required"),
   waterNeeded: Yup.number()
@@ -41,27 +43,27 @@ const validationSchema = Yup.object({
 });
 
 const formFields: FormField[] = [
-  { label: "Name* :", name: "name", type: "text" },
+  { label: "Name:", name: "name", type: "text" },
   { label: "Nickname :", name: "nickname", type: "text" },
   {
-    label: "Plant Type* :",
+    label: "Plant Type:",
     name: "plantType",
     type: "select",
     options: ["Indoor", "Outdoor"],
   },
   {
-    label: "Plant Size* :",
+    label: "Plant Size:",
     name: "plantSize",
     type: "select",
     options: ["S", "M", "L"],
   },
-  { label: "Water Needed* :", name: "waterNeeded", type: "number" },
-  { label: "Birthday* :", name: "birthday", type: "date" },
+  { label: "Water Needed:", name: "waterNeeded", type: "number" },
+  { label: "Birthday:", name: "birthday", type: "date" },
 ];
 
 export default function AddPlant() {
   const { data, loading, error, updateUserData } = useContext(UserContext);
-  const router = useRouter();
+  console.log(data)
   const [screenWidth, setScreenWidth] = useState(0);
   console.log(screenWidth)
   useEffect(() => {
@@ -87,7 +89,6 @@ export default function AddPlant() {
     waterAdded: 0,
     birthday: "",
     image: "",
-    new: true,
   };
   const [plantState, setPlantState] = useState(plantForm);
   useEffect(() => {
@@ -189,10 +190,10 @@ export default function AddPlant() {
   ) => {
     setSubmitting(true);
     console.log("Submitted", values);
+    // Get ms based timestamp of the date provided
     const date = new Date(values.birthday);
-    const timestamp = date.getTime() / 1000; // Divide by 1000 to convert milliseconds to seconds
-    const finalPlant = { ...values, birthday: timestamp, id: nanoid() };
-    // calculate waterAdded based on the current date
+    const timestamp = date.getTime();
+    values.birthday = timestamp;
     const currentDate = new Date();
     const currentDayOfMonth = currentDate.getDate();
     const currentYear = currentDate.getFullYear();
@@ -202,17 +203,24 @@ export default function AddPlant() {
       currentMonth + 1,
       0
     ).getDate();
-    finalPlant.waterAdded = Math.floor(
-      finalPlant.waterNeeded * (currentDayOfMonth / numberOfDaysInMonth)
+    values.waterAdded = Math.floor(
+      values.waterNeeded * (currentDayOfMonth / numberOfDaysInMonth)
     );
     if (plantRecommendations) {
-      finalPlant.image = plantRecommendations.image;
+      values.image = plantRecommendations.image;
     }
+    var image_update = values.image ? true : false
+    const finalPlant = { ...values, id: nanoid(), image_update  } as SavePlant;
+    console.log(finalPlant)
+    // calculate waterAdded based on the current date
     if (data) {
+      console.log("updated user data")
       data.plants.push(finalPlant);
       updateUserData(data);
-      router.replace("/");
-      //  setSubmitting(false)
+      setSubmitting(false)
+      if(window){
+        window.location.replace("/")
+      }
     } else {
       alert("ONLY LOGGED IN USERS CAN ADD A PLANT");
       setSubmitting(false);

@@ -48,42 +48,56 @@ const IDBProvider = ({ children }: ProvidersProps) => {
     }
     const fetchData = async () => {
       console.log("THE FETCH DATA HOOK RUNNING BC SESSION AUTHORIZED");
+      console.log(session)
       setLoading(true);
       setError(null);
       try {
-        const userInfo = await readUser(session.user.email);
+        console.log("getting info from db")
+        const userInfo = await readUser(session?.user?.email);
         //this means the user just signed up!
         //This code will run if the userData is not in the database
+        console.log("Info from db")
+        console.log(userInfo)
         if (!userInfo) {
+          console.log("no user info")
           const response = await fetch(
             `/api/user?email=${session?.user?.email}`
           );
+          console.log(response)
           let newUser = await response.json();
+          console.log("Fethced user info")
+          console.log(newUser)
           //add some error handling for newUser.error or whaterver the console.log of the response is
           newUser = {
             ...newUser,
-            lastSynced: Date.now(),
+            last_synced: Date.now(),
           };
           return updateUserData(newUser);
         }
         // This will run if the last time it was synced is greater than 24 hours. We will first insure that there are no updates pending, if ther are, we will fetch the DB to update, and simply just return.
-        if (isGreaterThanDay(userInfo.lastSynced)) {
+        console.log("Checking if greather than a day")
+        if (isGreaterThanDay(userInfo.last_synced)) {
           //check if there are modifications
-          if (userInfo.isModified) {
+          console.log("user info is greater than a day")
+          if (userInfo.is_modified) {
             console.log("we gotta save data to db by fetching updateUser");
             //we should return updateUserData with current user info, just delete isModified. Additionally, I must return
+            //perform a fetch request if there's something to update
                //add some error handling for failed update.error or whaterver the console.log of the response is
             return updateUserData(userInfo);
           }
+          console.log("GETTING THE LATEST INOFOMRATION THEN")
           const response = await fetch(`/api/user?email=${session.user.email}`);
           let syncronizedUser = await response.json();
              //add some error handling for newUser.error or whaterver the console.log of the response is
           syncronizedUser = {
             ...syncronizedUser,
-            lastSynced: Date.now(),
+            last_synced: Date.now(),
           };
           return updateUserData(syncronizedUser);
         }
+        console.log("user data is still current, no need to update.")
+       return updateUserData(userInfo);
       } catch (error) {
         setError(error);
       } finally {
@@ -91,7 +105,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
       }
     };
     fetchData();
-  }, [session]);
+  }, [status]);
 
   useEffect(() => {
     if (status === "authenticated" || data !== null) {

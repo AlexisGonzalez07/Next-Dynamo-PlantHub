@@ -98,12 +98,13 @@ const options: NextAuthOptions = {
           throw new Error("Invalid Account Credentials");
         }
         //means that they used an auth provider to sign up before, and must authenticate through their OAUTH login view
-        if (user.password === false) {
+        if (user.password === "") {
           throw new Error(
             "It looks like this email was previously registered. To protect your account, please login how you signed up and set your password through your account portal to enable normal login functionality."
           );
         }
         console.log("Comaring the password")
+        console.log(user.password)
         var validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
           //invalid password catch
@@ -111,6 +112,7 @@ const options: NextAuthOptions = {
         }
 
         //I have a valid user
+        console.log("valid user")
         return {
           id: nanoid(),
           email: user.email,

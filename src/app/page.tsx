@@ -7,6 +7,7 @@ import AppPreview from "../components/AppPreview";
 export default function Home() {
   const { data, loading, error } = useContext(UserContext);
   console.log(data)
+  //we need to filter out is_deleted plants in future versions so that deleted plants can persist so that we can delete those S3 images if no longer needed.
   if (!data && error === "Offline or Unauthenticated") {
     return <AppPreview/>;
   } else if (error) {
@@ -15,7 +16,7 @@ export default function Home() {
   if (loading) {
     return (
       <>
-        <Loading />
+        <Loading/>
       </>
     );
   }
@@ -25,7 +26,7 @@ export default function Home() {
     day: "numeric",
     year: "numeric",
   };
-  const dateToFormat = new Date();
+  const dateToFormat = new Date(data?.createdAt);
   const formattedDate = dateToFormat.toLocaleDateString("en-US", options);
   return (
     <div className="flex flex-col h-full w-full justify-around items-center py-2">
