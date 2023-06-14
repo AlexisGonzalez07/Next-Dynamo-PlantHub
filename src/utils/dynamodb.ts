@@ -94,25 +94,29 @@ export async function createUser(email: string, data: string){
   }
 
 
-// export async function updateUser(userEmail:string, newPlant:string){
-//   const params = {
-//     TableName: process.env.AWS_DYNAMO_TABLE,
-//     Key: {
-//       // Specify the primary key of the item to update
-//       primaryKey: userEmail
-//     },
-//     UpdateExpression: 'SET plants = :newValue',
-//     ExpressionAttributeValues: {
-//       ':newValue': newPlant
-//     },
-//     ReturnValues: 'ALL_NEW' // Optional. Specify the values to be returned after the update
-//   };
-//   try {
-//     const updated = await dynamodb.update(params).promise()
-//     console.log("Added plant")
-//     console.log(updated)
-//   } catch (error) {
-//     console.log("error adding plant")
-//     console.log(error)
-//   }
-// }
+export async function updateUser(userEmail:string, data:string){
+
+    const params = {
+    TableName: process.env.AWS_DYNAMO_TABLE,
+    Key: {
+      primaryKey: userEmail
+    },
+    UpdateExpression: 'SET #data = :newValue',
+    ExpressionAttributeNames: {
+      '#data': 'data'
+    },
+    ExpressionAttributeValues: {
+      ':newValue': data
+    },
+    ReturnValues: 'ALL_NEW'
+  };
+
+  try {
+    const updated = await dynamodb.update(params).promise()
+    console.log("Updated User")
+    console.log(updated)
+  } catch (error) {
+    console.log("error updating user")
+    console.log(error)
+  }
+}

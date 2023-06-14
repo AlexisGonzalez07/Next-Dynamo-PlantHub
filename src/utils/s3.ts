@@ -17,9 +17,9 @@ const uploadImageToS3 = (params): Promise<string | Error> => {
         console.log("Error uploading image:", err);
         reject(err);
       } else {
-        console.log("Image uploaded successfully:", data.Location);
+        console.log("Image uploaded successfully:", data);
         //Just return the location of the image in the bucket
-        resolve(data.Location as string);
+        resolve(data);
       }
     });
   });
@@ -40,9 +40,9 @@ export const uploadImage = async (imageLink: string) => {
     Body: fileContent,
   };
   try {
-    const imageLocation = await uploadImageToS3(params);
-    console.log("Upload response:", imageLocation);
-    return imageLocation;
+    const response = await uploadImageToS3(params);
+    console.log("Upload response:", response);
+    return response;
     // Handle the upload response or perform any additional actions
   } catch (error) {
     console.log("Upload error:", error);

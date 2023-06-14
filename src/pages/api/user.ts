@@ -24,8 +24,6 @@ export default async function handler(
       console.log(req.body);
       const body = JSON.parse(req.body);
       console.log(body);
-      const plants = body.plants;
-      console.log(plants);
       //I need to be sure to stringify the plants whenever I'm done with the app, and upload images only plants with the tag new, then reintegrate them back to the array
 
       //Later when I add image upload change, if they change the image, I'll have to be sure to upload to S3 as well in that scenario
