@@ -29,6 +29,7 @@ const PlantCard: React.FC<PlantCardProps> = ({ card }) => {
       }
       return plant;
     });
+    data.is_modified = true
     updateUserData(data);
   };
 
@@ -51,6 +52,7 @@ const PlantCard: React.FC<PlantCardProps> = ({ card }) => {
       }
       return plant;
     });
+    data.is_modified = true
     setWaterMessage("Add Water");
     updateUserData(data);
   };

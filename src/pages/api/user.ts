@@ -70,6 +70,7 @@ console.log("Plant needs to be updated")
         }
       }
       //save user to dynamo db
+      data.is_modified = false
       //I believe we must surely hash the password on the front end, if the user sets up a password after not having one becuase of OAUTH
       const dataSaved = await createUser(email,JSON.stringify(data))
       res.json({message: "All data uploaded"})

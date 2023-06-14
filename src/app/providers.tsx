@@ -80,10 +80,39 @@ const IDBProvider = ({ children }: ProvidersProps) => {
           //check if there are modifications
           console.log("user info is greater than a day")
           if (userInfo.is_modified) {
-            console.log("we gotta save data to db by fetching updateUser");
+            const {
+              firstName,
+              lastName,
+              email,
+              createdAt,
+              username,
+              password,
+              plants,
+              last_synced,
+            } = userInfo;
+            const updateUserInfoReq = await fetch(`/api/user?email=${session.user.email}`, {
+              method: "POST",
+              body: JSON.stringify({
+                firstName,
+                lastName,
+                email,
+                createdAt,
+                username,
+                password,
+                plants,
+                last_synced,
+              })})
+              const responseData = await updateUserInfoReq.json();
+              if(responseData.message !== "All data uploaded"){
+                throw new Error("Error uploading to db")
+
+                    }
+            // console.log("we gotta save data to db by fetching updateUser");
             //we should return updateUserData with current user info, just delete isModified. Additionally, I must return
+            // if response.
             //perform a fetch request if there's something to update
                //add some error handling for failed update.error or whaterver the console.log of the response is
+               userInfo.is_modified = false
             return updateUserData(userInfo);
           }
           console.log("GETTING THE LATEST INOFOMRATION THEN")
