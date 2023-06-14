@@ -1,4 +1,5 @@
 import AWS from "aws-sdk";
+import bcrypt from "bcrypt"
 export interface PlantModel{
   id: string,
   birthday: number,
@@ -56,15 +57,7 @@ export async function getUser(email: string, requestType?: string) {
       return undefined
     }
     var userData = JSON.parse(user.data)
-    //userData contains all the user information //username, plants, hashed password if exits, plants.
-    if(!requestType){
-      userData.password !== ""
-      ? userData.password = true
-      : userData.password = false
-    } else if (requestType === "credentials-request"){
-      userData.password === "" ? userData.password = false : console.log("no encrityped")
-    }
-
+    //userData contains all the user information //username, plants, hashed password if exists
     const formattedUser: UserModel = {...userData, email: user.email}
     return formattedUser
   } catch (error) {

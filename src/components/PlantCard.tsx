@@ -19,8 +19,16 @@ const PlantCard: React.FC<PlantCardProps> = ({ card }) => {
   const [waterMessage, setWaterMessage] = useState("Add Water");
   const [deleteMessage, setDeleteMessage] = useState("Delete Plant");
   const handleDeletePlant = async () => {
-    data.plants = data.plants.filter((plant) => plant.id !== card.id);
-    setDeleteMessage("Delete Plant");
+    //This should be changed so that the data stays, it just includes an is_deleted boolean key if the plant has an uploaded image on the S3 container, so that we can delete it. Eventually, we'll add the objectKey so that we can directly delete it from here.
+    data.plants = data.plants.map((plant) => {
+      if (plant.id === card.id) {
+        return {
+          ...plant,
+          is_deleted: true,
+        };
+      }
+      return plant;
+    });
     updateUserData(data);
   };
 
@@ -31,7 +39,7 @@ const PlantCard: React.FC<PlantCardProps> = ({ card }) => {
     day: "numeric",
     year: "numeric",
   };
-  const dateToFormat = new Date((card.birthday as any) * 1000);
+  const dateToFormat = new Date(card.birthday);
   const formattedDate = dateToFormat.toLocaleDateString("en-US", options);
   const addWater = () => {
     data.plants = data.plants.map((plant) => {
@@ -71,13 +79,15 @@ const PlantCard: React.FC<PlantCardProps> = ({ card }) => {
 
   return (
     <div className="card lg:card-side bg-secondary shadow-xl ">
-      <figure >
-        <img src={card.image || "/modernPlant.jpg"} alt={card.name} className="max-w-96 max-h-96"/>
+      <figure>
+        <img
+          src={card.image || "/modernPlant.jpg"}
+          alt={card.name}
+          className="max-w-96 max-h-96"
+        />
       </figure>
       <div className="card-body text-primary px-1">
-        <h2 className="card-title">
-         {card.nickname || card.name}
-        </h2>
+        <h2 className="card-title">{card.nickname || card.name}</h2>
         <p>Birthday: {formattedDate}</p>
         <p>Type: {card.plantType}</p>
         <p>Size: {card.plantSize}</p>

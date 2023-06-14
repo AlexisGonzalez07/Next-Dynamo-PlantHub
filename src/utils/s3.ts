@@ -29,23 +29,31 @@ export const uploadImage = async (imageLink: string) => {
   if (!imageLink){
     throw new Error ("No image link provided to upload image")
   }
-  const response = await axios.get(imageLink, { responseType: "arraybuffer" });
+  const response = await axios.get(imageLink, { responseType: "arraybuffer" }) as any;
   console.log(response);
-  const fileContent = response.data;
+  if(!response.ok){
+    throw new Error("Error fetching image link.")
+  }
+  const fileContent = response.data as ArrayBuffer;
+  console.log(fileContent)
   const fileName = nanoid();
+  try {
+    //get image type since it will always end in .jpg, .jpeg, or .png
   const fileExtension = imageLink.split(".")[imageLink.split(".").length - 1];
+  //To optimize security, I could use AWSRouter to route  traffic from a front end key 
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: `${process.env.AWS_BUCKET_FOLDER}/${fileName}${fileExtension}`,
     Body: fileContent,
   };
-  try {
     const response = await uploadImageToS3(params);
     console.log("Upload response:", response);
+    //need to handle any error responses here
     return response;
     // Handle the upload response or perform any additional actions
   } catch (error) {
+    return error
     console.log("Upload error:", error);
-    return error;
+    return Error("Failed upload")
   }
 };
