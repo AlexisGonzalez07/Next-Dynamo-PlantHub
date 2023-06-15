@@ -1,6 +1,10 @@
 # Next Dynamo PlantHub: Plant Identification and Care Application
 
 Next Dynamo PlantHub is a user-friendly and comprehensive plant identification and care application designed to help gardening enthusiasts manage their plants effectively. The real fun, was developing an application centered around the user experience.
+
+[Visit Next Dyanamo PlantHub Now](https://next-dynamo-plant-hub.vercel.app/)
+
+
 <br></br>
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
@@ -64,6 +68,8 @@ To create a seamless and enjoyable user experience, Next Dynamo PlantHub priorit
 - **Independent Development, Testing, and Deployment**: Next Dynamo PlantHub was developed, tested, and deployed independently, showcasing my ability to handle the entire development cycle. From coding to testing and deployment, I took full ownership of the project without external assistance.
 
 ## PlantHub Refactor: Lessons Learned
+
+[Visit PlantHub Refactor Now](https://plant-hub-refactor-client.vercel.app/)
 
 In the previous project, PlantHub Refactor, I encountered several challenges that hindered the desired user experience. Some of the issues included:
 
