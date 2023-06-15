@@ -115,6 +115,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
                userInfo.is_modified = false
             return updateUserData(userInfo);
           }
+          //this means user is out of sync, just perform daily query
           console.log("GETTING THE LATEST INOFOMRATION THEN")
           const response = await fetch(`/api/user?email=${session.user.email}`);
           let syncronizedUser = await response.json();
