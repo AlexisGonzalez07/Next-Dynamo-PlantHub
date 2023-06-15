@@ -50,19 +50,22 @@ console.log("Plant needs to be updated")
           //we need to save the object key, and make the image = to the Location
           try {
             const {Location, key} = await uploadImage(plant.image);
+            console.log("image uploaded")
+            console.log(Location)
+            console.log(key)
             //key includes aws_bucket_folder, which is part of the key, so we need to format it here
             data.plants[i].image = Location
-            data.plants[i].image_key = key.split("/")[1]
+            data.plants[i].image_key = key
             data.plants[i].image_update = false
           } catch (error) {
             //This could be abstracted to an error handling function
+            if(error === "No image link provided to upload image"){
+              // not sure why this would happen, but need to handle in case of poor code
+              console.log(error)
+            }
             if(error === "Error fetching image link"){
               //Need to handle this error properly
               //This is probably going to happen when the user plant id thing stops
-              console.log(error)
-            }
-            if(error === "No image link provided to upload image"){
-              // not sure why this would happen, but need to handle in case of poor code
               console.log(error)
             }
             //this means there's the unhandled error for a failed uploadImageToS3(params) call in uploadImage function()
