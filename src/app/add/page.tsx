@@ -150,6 +150,14 @@ export default function AddPlant() {
       alert(error);
     }
   };
+  function loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = src;
+    });
+  }
 
   const handleUpload = (file: File) => {
     const fileExtension = file.name.split(".").pop().toLowerCase();
@@ -158,12 +166,32 @@ export default function AddPlant() {
       alert("Only JPEG, JPG, and PNG files are allowed");
       return;
     }
+    console.log("HELLO")
     const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setPreviewImage(reader.result as string);
-    };
+    reader.readAsDataURL(file);    
+   
+    reader.onloadend = async function (e) {
+      console.log("reader loading")
+      const img = await loadImage(e.target?.result as string);      
+      console.log(img)
+        console.log("IMAGE ON LOAD")
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        if (ctx) {
+          const targetWidth = 500;
+          const targetHeight = 500;
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          const resizedImage = canvas.toDataURL('image/jpeg', .9);
+          console.log(resizedImage); // Do so
+          setPreviewImage(resizedImage)
+        }
+    //   reader.onloadend = () => {
+    //   setPreviewImage(reader.result as string);
+    // };
   };
+}
 
   const handleProceed = () => {
     if (previewImage) {
