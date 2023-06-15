@@ -38,12 +38,12 @@ const validationSchema = Yup.object({
 });
 
 const formFields: FormField[] = [
-  { label: "Email *", name: "email", type: "email" },
+  { label: "Email", name: "email", type: "email" },
   { label: "First Name *", name: "firstName", type: "text" },
   { label: "Last Name *", name: "lastName", type: "text" },
   { label: "Username", name: "username", type: "text" },
-  { label: "Password *", name: "password", type: "password" },
-  { label: "Confirm Password *", name: "confirmPassword", type: "password" },
+  { label: "Password", name: "password", type: "password" },
+  { label: "Confirm Password", name: "confirmPassword", type: "password" },
 ];
 
 const initialState: SignUpUser = {
@@ -64,20 +64,20 @@ const SignUpForm: React.FC = () => {
     setSubmitting(true);
     const { email, firstName, lastName, username, password, confirmPassword } =
       values;
-      const result = await signIn("credentials", {
-        email,
-        firstName,
-        lastName,
-        username,
-        password,
-        confirmPassword,
-        redirect: false,
-      });
-      console.log(result);
-      if(result.error){
-        setErrorMessage(result.error)
-        setSubmitting(false)
-      }
+        const result = await signIn("credentials", {
+          email,
+          firstName,
+          lastName,
+          username,
+          password,
+          confirmPassword,
+          redirect: false,
+        });
+        if(result.error){
+          setErrorMessage(result.error)
+          setSubmitting(false)
+        }
+   
     }
 
   return (

@@ -8,16 +8,9 @@ import { writeLastLogged } from "../../utils/idb";
 export default function Account() {
   const { data, loading, error } = useContext(UserContext);
   const { data: session } = useSession();
-
-    console.log("This is the Account Page");
-  console.log(data);
-  console.log(loading);
-  console.log(session);
   const [checkedTab, setCheckedTab] = useState<String>("");
   const { theme, toggleTheme } = useContext(ThemeContext);
   useEffect(() => {
-    console.log("rerender");
-    console.log(data);
   }, [data]);
   if (!data && error === "Offline or Unauthenticated") {
     return <Credentials />;
@@ -46,8 +39,6 @@ export default function Account() {
         window.location.replace("/")
         return
       }    }
-    console.log("Signing out!");
-    console.log("FORMATTED DATA");
     // Will definitely want to save the user email dat in the backend, need to configure. For now, I'll focus on removing idb and then, update the globalState to setError("Offline or Anauthenticated")
     // Additionally, I would like to delete the last_credentials database
     const {
@@ -73,7 +64,6 @@ export default function Account() {
         last_synced,
       }),
     });
-    console.log(response);
     const responseData = await response.json();
     if(responseData.message !== "All data uploaded"){
 throw new Error("Error uploading to db")
@@ -83,9 +73,8 @@ throw new Error("Error uploading to db")
     // if we are not online, this will fail. Must check if we are connected to our servers.
     try {
       await writeLastLogged(undefined);
-      console.log("Successfully reset db");
     } catch (error) {
-      console.log("didn't empty credentials");
+      console.error("didn't empty backup");
     }
     await signOut();
     if(window){

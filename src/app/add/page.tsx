@@ -63,9 +63,7 @@ const formFields: FormField[] = [
 
 export default function AddPlant() {
   const { data, loading, error, updateUserData } = useContext(UserContext);
-  console.log(data)
   const [screenWidth, setScreenWidth] = useState(0);
-  console.log(screenWidth)
   useEffect(() => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
@@ -149,8 +147,6 @@ export default function AddPlant() {
         });
       }
     } catch (error) {
-      console.log("ERROR WITH IMAGE");
-      console.log(error);
       alert(error);
     }
   };
@@ -170,14 +166,12 @@ export default function AddPlant() {
   };
 
   const handleProceed = () => {
-    console.log("proceeding");
     if (previewImage) {
       processFileData(previewImage.split("base64,")[1]);
     }
     setStep((prevStep) => (prevStep += 1));
   };
   const handleGoBack = () => {
-    console.log("going back");
     setStep((prevStep) => (prevStep -= 1));
   };
   const handleCancel = () => {
@@ -189,7 +183,6 @@ export default function AddPlant() {
     { setSubmitting }: FormikHelpers<Plant>
   ) => {
     setSubmitting(true);
-    console.log("Submitted", values);
     // Get ms based timestamp of the date provided
     const date = new Date(values.birthday);
     const timestamp = date.getTime();
@@ -211,10 +204,8 @@ export default function AddPlant() {
     }
     var image_update = values.image ? true : false
     const finalPlant = { ...values, id: nanoid(), image_update  } as SavePlant;
-    console.log(finalPlant)
     // calculate waterAdded based on the current date
     if (data) {
-      console.log("updated user data")
       data.plants.push(finalPlant);
       updateUserData(data);
       setSubmitting(false)
@@ -222,7 +213,6 @@ export default function AddPlant() {
         window.location.replace("/")
       }
     } else {
-      alert("ONLY LOGGED IN USERS CAN ADD A PLANT");
       setSubmitting(false);
     }
   };
@@ -349,7 +339,7 @@ export default function AddPlant() {
             <div className="mx-auto px-4 text-white">
               <h1 className="text-3xl font-bold">Add A New Plant</h1>
               <p className="text-sm mt-2">
-                Fields with * are required
+                All fields are required
               </p>
             </div>
           )}

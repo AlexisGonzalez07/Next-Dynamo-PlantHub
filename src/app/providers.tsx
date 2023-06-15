@@ -31,11 +31,6 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { data: session, status } = useSession(); // Access session information
-  console.log(data);
-  console.log(loading);
-  console.log(error);
-  console.log(session);
-  console.log(status);
   useEffect(() => {
     if (status !== "authenticated") {
       return;
@@ -47,26 +42,18 @@ const IDBProvider = ({ children }: ProvidersProps) => {
       return timestamp > currentTime + oneDayMilliseconds;
     }
     const fetchData = async () => {
-      console.log("THE FETCH DATA HOOK RUNNING BC SESSION AUTHORIZED");
-      console.log(session)
       setLoading(true);
       setError(null);
       try {
-        console.log("getting info from db")
         const userInfo = await readUser(session?.user?.email);
         //this means the user just signed up!
         //This code will run if the userData is not in the database
-        console.log("Info from db")
-        console.log(userInfo)
         if (!userInfo) {
           console.log("no user info")
           const response = await fetch(
             `/api/user?email=${session?.user?.email}`
           );
-          console.log(response)
           let newUser = await response.json();
-          console.log("Fethced user info")
-          console.log(newUser)
           //add some error handling for newUser.error or whaterver the console.log of the response is
           newUser = {
             ...newUser,
@@ -75,10 +62,8 @@ const IDBProvider = ({ children }: ProvidersProps) => {
           return updateUserData(newUser);
         }
         // This will run if the last time it was synced is greater than 24 hours. We will first insure that there are no updates pending, if ther are, we will fetch the DB to update, and simply just return.
-        console.log("Checking if greather than a day")
         if (isGreaterThanDay(userInfo.last_synced)) {
           //check if there are modifications
-          console.log("user info is greater than a day")
           if (userInfo.is_modified) {
             const {
               firstName,
@@ -116,17 +101,14 @@ const IDBProvider = ({ children }: ProvidersProps) => {
             return updateUserData(userInfo);
           }
           //this means user is out of sync, just perform daily query
-          console.log("GETTING THE LATEST INOFOMRATION THEN")
           const response = await fetch(`/api/user?email=${session.user.email}`);
           let syncronizedUser = await response.json();
-             //add some error handling for newUser.error or whaterver the console.log of the response is
           syncronizedUser = {
             ...syncronizedUser,
             last_synced: Date.now(),
           };
           return updateUserData(syncronizedUser);
         }
-        console.log("user data is still current, no need to update.")
        return updateUserData(userInfo);
       } catch (error) {
         setError(error);
@@ -142,10 +124,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
       return;
     }
     const tryLastLoggedIn = async () => {
-      console.log(
-        "THE TRY LAST LOGGIN RAN BC LOADING ALLTHOUGH LOADING IS CURRENTLY TRUE, SESSION IS NOT ONLINE, OR DATA IS NULL BECAUSE USER SIGNED OUT"
-      );
-      //This should be await read last logged in token for still available?
+      //Check if no session, so that there's a user trying to 
       const userInfo = await readLastLogged();
       if (!userInfo) {
         setError("Offline or Unauthenticated");
@@ -178,7 +157,6 @@ const IDBProvider = ({ children }: ProvidersProps) => {
   }, [loading, session, data]);
 
   const updateUserData = async (user) => {
-    console.log("THE UPDATE USER DATA RUNNING");
     try {
       setLoading(true);
       setError(null);
@@ -220,8 +198,6 @@ export function ThemeProvider({ children }: ProvidersProps) {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    console.log("USE EFFECT RUNNING");
-    console.log(theme);
     const html = document.querySelector("html");
     html.removeAttribute("data-theme");
     html.setAttribute("data-theme", localStorage.getItem("theme"));
