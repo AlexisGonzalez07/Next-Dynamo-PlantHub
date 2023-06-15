@@ -107,7 +107,7 @@ const PlantCard: React.FC<PlantCardProps> = ({ card }) => {
             max="100"
           ></progress>
           <button
-            className="btn btn-secondary"
+            className="btn btn-secondary text-primary"
             disabled={status === "I'm thirsty!" ? false : true}
             onClick={() => {
               if (waterMessage === "Add Water") {

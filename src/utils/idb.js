@@ -33,8 +33,7 @@ const openUserDb = () => {
   
       request.onsuccess = (event) => {
         const user = event.target.result;
-        console.log("THIS IS WHAT WAS READ")
-        console.log(typeof user)
+   
         resolve(user);
       };
   
@@ -121,8 +120,6 @@ export const readLastLogged = async () => {
 
     request.onsuccess = (event) => {
       const user = event.target.result;
-      console.log('READ BACKUP DB')
-      console.log(user)
       resolve(user);
     };
 

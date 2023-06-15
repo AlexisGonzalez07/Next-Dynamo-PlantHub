@@ -44,7 +44,6 @@ const LoginForm: React.FC = () => {
       password,
       redirect: false,
     });
-    console.log(result);
     if (result.error) {
       setErrorMessage(result.error);
       setSubmitting(false);

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { UserContext, ThemeContext } from "../app/providers";
 const FooterNav: React.FC = () => {
   const tab = usePathname();
-  console.log(tab)
   // const [isModalOpen, setIsModalOpen] = useState(false);
   // const openModal = () => {
   //   setIsModalOpen(true);
