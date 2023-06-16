@@ -2,11 +2,11 @@
 import { useState, useEffect, useContext } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import AppPreview from "../../components/AppPreview";
 import axios from "axios";
 import { UserContext } from "../providers";
 import { nanoid } from "nanoid";
 import Loading from "../../components/Loading";
+import PlantPreview from "../../components/PlantPreview";
 interface Plant {
   name: string;
   nickname: string;
@@ -249,7 +249,7 @@ export default function AddPlant() {
   }
 
   if (!data && error === "Offline or Unauthenticated") {
-    return <AppPreview/>;
+    return <PlantPreview/>;
   } else if (error) {
     return <h1>Undiagnozed home error</h1>;
   }
