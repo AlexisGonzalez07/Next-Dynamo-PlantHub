@@ -32,7 +32,7 @@ export default function Home() {
       <div className="stats shadow bg-secondary flex justify-center w-full ">
         <div className="stat lg:w-2/5 place-items-center">
           <div className="stat-title text-primary">User</div>
-          <div className="stat-value text-primary">{data?.username}</div>
+          <div className="stat-value text-primary">{data?.username || data?.firstName}</div>
           <div className="stat-desc text-primary">Since {formattedDate}</div>
         </div>
 

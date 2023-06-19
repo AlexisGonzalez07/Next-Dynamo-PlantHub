@@ -47,7 +47,6 @@ export default function Account() {
       email,
       createdAt,
       username,
-      password,
       plants,
       last_synced,
     } = data;
@@ -59,13 +58,12 @@ export default function Account() {
         email,
         createdAt,
         username,
-        password,
         plants,
         last_synced,
       }),
     });
     const responseData = await response.json();
-    if(responseData.message !== "All data uploaded"){
+    if(responseData.message !== "All data updated"){
 throw new Error("Error uploading to db")
     }
     // if successfull, change the data plants and remove key new or image_updated that I add to plants during creation/update
