@@ -74,12 +74,12 @@ const options: NextAuthOptions = {
             lastName,
             createdAt,
             username, 
-            password: hashedPassword,
             plants: []
           } as NewUser)
           const created = await createUser(
             email,
             data,
+            hashedPassword
           );
           if (!created) {
             throw new Error("Unable to sign up");

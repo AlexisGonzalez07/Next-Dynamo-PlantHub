@@ -1,4 +1,4 @@
-import { createUser, getUser } from "../../utils/dynamodb";
+import { createUser, getUser, updateUser } from "../../utils/dynamodb";
 import { uploadImage } from "../../utils/s3";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -21,6 +21,12 @@ export default async function handler(
       if (user === undefined) {
         return res.status(400).json({ error: "No user found with that id" });
       }
+      if(user.password){
+        user.hasPassword = true
+      }
+      delete user.password
+      console.log("just deleted the password and added hasPassword key")
+      console.log(user)
       res.status(200).json(user);
       break;
     case "POST":
@@ -75,8 +81,8 @@ console.log("Plant needs to be updated")
       //save user to dynamo db
       data.is_modified = false
       //I believe we must surely hash the password on the front end, if the user sets up a password after not having one becuase of OAUTH
-      const dataSaved = await createUser(email,JSON.stringify(data))
-      res.json({message: "All data uploaded"})
+      const dataSaved = await updateUser(email,JSON.stringify(data))
+      res.json({message: "All data updated"})
       break;
       //I need to be sure to stringify the plants whenever I'm done with the app, and upload images only plants with the tag new, then reintegrate them back to the array
 

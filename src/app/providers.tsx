@@ -49,7 +49,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
         //this means the user just signed up!
         //This code will run if the userData is not in the database
         if (!userInfo) {
-          console.log("no user info")
+          console.log("no user info");
           const response = await fetch(
             `/api/user?email=${session?.user?.email}`
           );
@@ -59,6 +59,8 @@ const IDBProvider = ({ children }: ProvidersProps) => {
             ...newUser,
             last_synced: Date.now(),
           };
+          console.log("THIS IS THE USER THAT WE FETCHED THAT IS NEW");
+          console.log(newUser);
           return updateUserData(newUser);
         }
         // This will run if the last time it was synced is greater than 24 hours. We will first insure that there are no updates pending, if ther are, we will fetch the DB to update, and simply just return.
@@ -71,33 +73,34 @@ const IDBProvider = ({ children }: ProvidersProps) => {
               email,
               createdAt,
               username,
-              password,
               plants,
               last_synced,
             } = userInfo;
-            const updateUserInfoReq = await fetch(`/api/user?email=${session.user.email}`, {
-              method: "POST",
-              body: JSON.stringify({
-                firstName,
-                lastName,
-                email,
-                createdAt,
-                username,
-                password,
-                plants,
-                last_synced,
-              })})
-              const responseData = await updateUserInfoReq.json();
-              if(responseData.message !== "All data uploaded"){
-                throw new Error("Error uploading to db")
-
-                    }
+            const updateUserInfoReq = await fetch(
+              `/api/user?email=${session.user.email}`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  firstName,
+                  lastName,
+                  email,
+                  createdAt,
+                  username,
+                  plants,
+                  last_synced,
+                }),
+              }
+            );
+            const responseData = await updateUserInfoReq.json();
+            if (responseData.message !== "All data uploaded") {
+              throw new Error("Error uploading to db");
+            }
             // console.log("we gotta save data to db by fetching updateUser");
             //we should return updateUserData with current user info, just delete isModified. Additionally, I must return
             // if response.
             //perform a fetch request if there's something to update
-               //add some error handling for failed update.error or whaterver the console.log of the response is
-               userInfo.is_modified = false
+            //add some error handling for failed update.error or whaterver the console.log of the response is
+            userInfo.is_modified = false;
             return updateUserData(userInfo);
           }
           //this means user is out of sync, just perform daily query
@@ -109,7 +112,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
           };
           return updateUserData(syncronizedUser);
         }
-       return updateUserData(userInfo);
+        return updateUserData(userInfo);
       } catch (error) {
         setError(error);
       } finally {
@@ -124,7 +127,7 @@ const IDBProvider = ({ children }: ProvidersProps) => {
       return;
     }
     const tryLastLoggedIn = async () => {
-      //Check if no session, so that there's a user trying to 
+      //Check if no session, so that there's a user trying to
       const userInfo = await readLastLogged();
       if (!userInfo) {
         setError("Offline or Unauthenticated");
@@ -137,9 +140,8 @@ const IDBProvider = ({ children }: ProvidersProps) => {
         const targetDate = new Date(dateString);
         return currentDate.getTime() < targetDate.getTime();
       }
-      const targetDate = "2023-07-10T06:43:46.029Z";
       // attempt to validate the user
-      const validToken = isTokenValid(targetDate);
+      const validToken = isTokenValid(userInfo.expires);
       if (!validToken) {
         setError("Offline or Unauthenticated");
         setLoading(false);

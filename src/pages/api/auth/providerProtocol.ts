@@ -20,9 +20,8 @@ export const protocol = {
     lastName,
     createdAt,
     username,
-    password,
     plants: []
     } as NewUser)
-    return createUser(email, data);
+    return createUser(email, data,password);
   },
 };
