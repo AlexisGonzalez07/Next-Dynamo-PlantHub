@@ -235,6 +235,7 @@ export default function AddPlant() {
     // calculate waterAdded based on the current date
     if (data) {
       data.plants.push(finalPlant);
+      data.is_modified = true
       updateUserData(data);
       setSubmitting(false)
       if(window){
